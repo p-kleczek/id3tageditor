@@ -11,11 +11,16 @@ import id3editor.toolbox.ByteOpperations;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
-
-
 public abstract class MP3TagFrame extends MP3Object {
 
-	@XmlElements( {
+	private final static int TAG_ALTER_PRESERVATION_BIT_NUMBER = 7;
+	private final static int FILE_ALTER_PRESERVATION_BIT_NUMBER = 6;
+	private final static int READ_ONLY_BIT_NUMBER = 5;
+	private final static int COMPRESSION_BIT_NUMBER = 7;
+	private final static int ENCRYPTION_BIT_NUMBER = 6;
+	private final static int GROUPING_IDENTITY_BIT_NUMBER = 5;
+
+	@XmlElements({
 			@XmlElement(name = "defaultframe", type = DefaultFrame.class),
 			@XmlElement(name = "commentframe", type = CommentFrame.class),
 			@XmlElement(name = "pictureframe", type = PictureFrame.class),
@@ -23,13 +28,13 @@ public abstract class MP3TagFrame extends MP3Object {
 	public static final int HEADER_LENGTH = 10;
 	public static final String[] ENC_TYPES = { "ISO-8859-1", "UTF16",
 			"UTF-16BE", "UTF-8" };
-	String type = "EMPT";
-	boolean tagAlterPreservation = false;
-	boolean fileAlterPreservation = false;
-	boolean readOnly = false;
-	boolean compression = false;
-	boolean encryption = false;
-	boolean groupingIdentity = false;
+	private String type = "EMPT";
+	private boolean tagAlterPreservation = false;
+	private boolean fileAlterPreservation = false;
+	private boolean readOnly = false;
+	private boolean compression = false;
+	private boolean encryption = false;
+	private boolean groupingIdentity = false;
 
 	public MP3TagFrame() {
 
@@ -52,12 +57,17 @@ public abstract class MP3TagFrame extends MP3Object {
 		System.arraycopy(frameHeader, 8, flagArray, 0, 2);
 
 		type = new String(typeArray);
-		tagAlterPreservation = BitOppereations.testBit(flagArray[0], 0);
-		fileAlterPreservation = BitOppereations.testBit(flagArray[0], 1);
-		readOnly = BitOppereations.testBit(flagArray[0], 2);
-		compression = BitOppereations.testBit(flagArray[1], 0);
-		encryption = BitOppereations.testBit(flagArray[1], 1);
-		groupingIdentity = BitOppereations.testBit(flagArray[1], 2);
+		tagAlterPreservation = BitOppereations.testBit(flagArray[0],
+				TAG_ALTER_PRESERVATION_BIT_NUMBER);
+		fileAlterPreservation = BitOppereations.testBit(flagArray[0],
+				FILE_ALTER_PRESERVATION_BIT_NUMBER);
+		readOnly = BitOppereations.testBit(flagArray[0], READ_ONLY_BIT_NUMBER);
+		compression = BitOppereations.testBit(flagArray[1],
+				COMPRESSION_BIT_NUMBER);
+		encryption = BitOppereations.testBit(flagArray[1],
+				ENCRYPTION_BIT_NUMBER);
+		groupingIdentity = BitOppereations.testBit(flagArray[1],
+				GROUPING_IDENTITY_BIT_NUMBER);
 	}
 
 	public String getType() {
@@ -125,18 +135,23 @@ public abstract class MP3TagFrame extends MP3Object {
 		System.arraycopy(type.getBytes(), 0, result, 0, type.length());
 
 		if (tagAlterPreservation)
-			result[8] = BitOppereations.setBit(result[8], 0);
+			result[8] = BitOppereations.setBit(result[8],
+					TAG_ALTER_PRESERVATION_BIT_NUMBER);
 		if (fileAlterPreservation)
-			result[8] = BitOppereations.setBit(result[8], 1);
+			result[8] = BitOppereations.setBit(result[8],
+					FILE_ALTER_PRESERVATION_BIT_NUMBER);
 		if (readOnly)
-			result[8] = BitOppereations.setBit(result[8], 2);
+			result[8] = BitOppereations.setBit(result[8], READ_ONLY_BIT_NUMBER);
 
 		if (compression)
-			result[9] = BitOppereations.setBit(result[9], 0);
+			result[9] = BitOppereations.setBit(result[9],
+					COMPRESSION_BIT_NUMBER);
 		if (encryption)
-			result[9] = BitOppereations.setBit(result[9], 1);
+			result[9] = BitOppereations
+					.setBit(result[9], ENCRYPTION_BIT_NUMBER);
 		if (groupingIdentity)
-			result[9] = BitOppereations.setBit(result[9], 2);
+			result[9] = BitOppereations.setBit(result[9],
+					GROUPING_IDENTITY_BIT_NUMBER);
 
 		return result;
 	}

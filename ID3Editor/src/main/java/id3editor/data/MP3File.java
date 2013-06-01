@@ -13,12 +13,16 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-
 /**
  * 
  * @author Pawel, Florian, Sebastian (Gruppe 4)
  */
 public class MP3File extends MP3Object {
+
+	private static final int UNSYNCHRONIZATION_BIT_NUMBER = 7;
+	private static final int EXTENDED_HEADER_BIT_NUMBER = 6;
+	private static final int EXPERIMENTAL_INDICATOR_BIT_NUMBER = 5;
+
 	File path = new File("");
 
 	private boolean modified;
@@ -47,10 +51,12 @@ public class MP3File extends MP3Object {
 	public void createTag(byte[] tagHeader) {
 		System.arraycopy(tagHeader, 0, fileIdentifier, 0, 3);
 		System.arraycopy(tagHeader, 3, version, 0, 2);
-		unsynchronisation = id3editor.toolbox.BitOppereations.testBit(tagHeader[5], 0);
-		extendedHeader = id3editor.toolbox.BitOppereations.testBit(tagHeader[5], 1);
-		experimentalIndicator = id3editor.toolbox.BitOppereations
-				.testBit(tagHeader[5], 2);
+		unsynchronisation = id3editor.toolbox.BitOppereations.testBit(
+				tagHeader[5], UNSYNCHRONIZATION_BIT_NUMBER);
+		extendedHeader = id3editor.toolbox.BitOppereations.testBit(
+				tagHeader[5], EXTENDED_HEADER_BIT_NUMBER);
+		experimentalIndicator = id3editor.toolbox.BitOppereations.testBit(
+				tagHeader[5], EXPERIMENTAL_INDICATOR_BIT_NUMBER);
 	}
 
 	@XmlElement(name = "path")
@@ -284,13 +290,13 @@ public class MP3File extends MP3Object {
 		System.arraycopy(version, 0, result, 3, 2);
 
 		if (unsynchronisation)
-			BitOppereations.setBit(result[5], 0);
+			BitOppereations.setBit(result[5], UNSYNCHRONIZATION_BIT_NUMBER);
 
 		if (extendedHeader)
-			BitOppereations.setBit(result[5], 1);
+			BitOppereations.setBit(result[5], EXTENDED_HEADER_BIT_NUMBER);
 
 		if (experimentalIndicator)
-			BitOppereations.setBit(result[5], 2);
+			BitOppereations.setBit(result[5], EXPERIMENTAL_INDICATOR_BIT_NUMBER);
 
 		System.out.println("getData nach variablen: " + result.length);
 

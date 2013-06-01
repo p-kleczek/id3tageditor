@@ -10,8 +10,8 @@ import javax.xml.bind.annotation.XmlElement;
  */
 public class TextFrame extends MP3TagFrame {
 
-	byte encoding = 0;
-	String text = "";
+	private byte encoding = 0;
+	private String text = "";
 
 	public TextFrame() {
 	}
@@ -52,7 +52,7 @@ public class TextFrame extends MP3TagFrame {
 
 	@Override
 	public String toString() {
-		return type + ": " + "TextFrame" + " with " + encoding
+		return getType() + ": " + "TextFrame" + " with " + encoding
 				+ " encrypted.\ncontent: " + text;
 	}
 

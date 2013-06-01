@@ -39,7 +39,7 @@ public class DefaultFrame extends MP3TagFrame implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "Unknow: " + type;
+		return "Unknow: " + getType();
 	}
 
 	@Override

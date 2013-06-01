@@ -8,10 +8,10 @@ import java.io.UnsupportedEncodingException;
  */
 public class CommentFrame extends MP3TagFrame {
 
-	byte encoding = 0;
-	String language = "";
-	String shortDescription = "";
-	String actualText = "";
+	private byte encoding = 0;
+	private String language = "";
+	private String shortDescription = "";
+	private String actualText = "";
 
 	public CommentFrame() {
 	}
@@ -35,8 +35,8 @@ public class CommentFrame extends MP3TagFrame {
 			this.shortDescription = new String(discrArray,
 					ENC_TYPES[(int) encoding]);
 
-			byte[] textArray = new byte[content.length - (5 + counter + 1)];
-			System.arraycopy(content, 6 + counter, textArray, 0,
+			byte[] textArray = new byte[content.length - (5 + counter)];
+			System.arraycopy(content, 5 + counter, textArray, 0,
 					textArray.length);
 			this.actualText = new String(textArray, ENC_TYPES[(int) encoding]);
 		} catch (UnsupportedEncodingException ex) {

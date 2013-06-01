@@ -26,7 +26,7 @@ public class URLFrame extends MP3TagFrame {
 
 	@Override
 	public String toString() {
-		return type + ": " + url;
+		return getType() + ": " + url;
 	}
 
 	@Override

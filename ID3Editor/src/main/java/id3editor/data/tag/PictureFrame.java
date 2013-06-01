@@ -33,11 +33,11 @@ public class PictureFrame extends MP3TagFrame {
 			"Movie/video screen capture", "A bright coloured fish",
 			"Illustration", "Band/artist logotype", "Publisher/Studio logotype" };
 
-	byte encoding = 0;
-	String mimeType = "";
-	byte picturesType = 0;
-	String description = "";
-	byte[] image = new byte[0];
+	private byte encoding = 0;
+	private String mimeType = "";
+	private byte picturesType = 0;
+	private String description = "";
+	private byte[] image = new byte[0];
 
 	public PictureFrame() {
 	}
@@ -172,7 +172,7 @@ public class PictureFrame extends MP3TagFrame {
 
 	@Override
 	public String toString() {
-		return type + ": " + "PictureFrame" + " with " + encoding
+		return getType() + ": " + "PictureFrame" + " with " + encoding
 				+ " encryption.\nmimeType: " + mimeType + "\npictureType: "
 				+ PIC_TYPES[(int) picturesType] + "\ndescription: "
 				+ description;
