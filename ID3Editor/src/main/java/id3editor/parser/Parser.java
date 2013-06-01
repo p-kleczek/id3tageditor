@@ -20,7 +20,7 @@ import java.util.ArrayList;
  */
 public class Parser {
 
-	public static int getTagSize(byte[] tagHeader) throws Exception {
+	public static int getTagSize(byte[] tagHeader) {
 		byte[] sizeArray = new byte[4];
 		System.arraycopy(tagHeader, 6, sizeArray, 0, 4);
 
