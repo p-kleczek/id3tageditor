@@ -1,6 +1,6 @@
 package id3editor.toolbox;
 
-import id3editor.ViewElements.Application;
+import id3editor.mvc.Application;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+
 
 /**
  * The <code>ImageOperations</code> class provides methods for loading and

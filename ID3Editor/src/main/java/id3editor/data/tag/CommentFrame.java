@@ -6,12 +6,12 @@ import java.io.UnsupportedEncodingException;
  * 
  * @author Pawel, Florian, Sebastian (Gruppe 4)
  */
-public final class CommentFrame extends MP3TagFrame {
+public class CommentFrame extends MP3TagFrame {
 
-	private byte encoding = 0;
-	private String language = "";
-	private String shortDescription = "";
-	private String actualText = "";
+	byte encoding = 0;
+	String language = "";
+	String shortDescription = "";
+	String actualText = "";
 
 	public CommentFrame() {
 	}
@@ -33,12 +33,12 @@ public final class CommentFrame extends MP3TagFrame {
 			byte[] discrArray = new byte[counter];
 			System.arraycopy(content, 4, discrArray, 0, discrArray.length);
 			this.shortDescription = new String(discrArray,
-					ENC_TYPES.get(encoding));
+					ENC_TYPES[(int) encoding]);
 
-			byte[] textArray = new byte[content.length - (5 + counter)];
-			System.arraycopy(content, 5 + counter, textArray, 0,
+			byte[] textArray = new byte[content.length - (5 + counter + 1)];
+			System.arraycopy(content, 6 + counter, textArray, 0,
 					textArray.length);
-			this.actualText = new String(textArray, ENC_TYPES.get(encoding));
+			this.actualText = new String(textArray, ENC_TYPES[(int) encoding]);
 		} catch (UnsupportedEncodingException ex) {
 			System.err.println("Error while decoding commentFrame");
 			System.err.println(ex.toString());
@@ -84,9 +84,9 @@ public final class CommentFrame extends MP3TagFrame {
 
 		try {
 			shortDescriptionArray = shortDescription
-					.getBytes(MP3TagFrame.ENC_TYPES.get(encoding));
-			actualTextArray = actualText.getBytes(MP3TagFrame.ENC_TYPES
-					.get(encoding));
+					.getBytes(MP3TagFrame.ENC_TYPES[(int) encoding]);
+			actualTextArray = actualText
+					.getBytes(MP3TagFrame.ENC_TYPES[encoding]);
 		} catch (Exception e) {
 			System.err.println("Error in CommentFrame.getContentBytes");
 		}
@@ -120,12 +120,12 @@ public final class CommentFrame extends MP3TagFrame {
 		this.encoding = encoding;
 	}
 
-	public void setActualText(String actualText) {
-		this.actualText = actualText;
-	}
-
 	public String getActualText() {
 		return actualText;
+	}
+
+	public void setActualText(String actualText) {
+		this.actualText = actualText;
 	}
 
 	@Override

@@ -4,10 +4,6 @@ package id3editor.data.tag;
  * @author Gruppe4
  */
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import id3editor.data.MP3Object;
 import id3editor.toolbox.BitOppereations;
 import id3editor.toolbox.ByteOpperations;
@@ -15,32 +11,25 @@ import id3editor.toolbox.ByteOpperations;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
+
+
 public abstract class MP3TagFrame extends MP3Object {
 
 	@XmlElements( {
 			@XmlElement(name = "defaultframe", type = DefaultFrame.class),
 			@XmlElement(name = "commentframe", type = CommentFrame.class),
 			@XmlElement(name = "pictureframe", type = PictureFrame.class),
-			@XmlElement(name = "textframe", type = TextFrameTest.class) })
+			@XmlElement(name = "textframe", type = TextFrame.class) })
 	public static final int HEADER_LENGTH = 10;
-	public static final Map<Byte, String> ENC_TYPES;
-	protected String type = "EMPT";
-	protected boolean tagAlterPreservation = false;
-	protected boolean fileAlterPreservation = false;
-	protected boolean readOnly = false;
-	protected boolean compression = false;
-	protected boolean encryption = false;
-	protected boolean groupingIdentity = false;
-	
-	static {
-		Map<Byte, String> encMap= new HashMap<Byte, String>();
-		encMap.put((byte) 0x00, "ISO-8859-1");
-		encMap.put((byte) 0x01, "UTF16");
-		encMap.put((byte) 0x02, "UTF-16BE");
-		encMap.put((byte) 0x03, "UTF-8");
-		
-		ENC_TYPES = Collections.unmodifiableMap(encMap);
-	}
+	public static final String[] ENC_TYPES = { "ISO-8859-1", "UTF16",
+			"UTF-16BE", "UTF-8" };
+	String type = "EMPT";
+	boolean tagAlterPreservation = false;
+	boolean fileAlterPreservation = false;
+	boolean readOnly = false;
+	boolean compression = false;
+	boolean encryption = false;
+	boolean groupingIdentity = false;
 
 	public MP3TagFrame() {
 
@@ -63,12 +52,12 @@ public abstract class MP3TagFrame extends MP3Object {
 		System.arraycopy(frameHeader, 8, flagArray, 0, 2);
 
 		type = new String(typeArray);
-		tagAlterPreservation = BitOppereations.testBit(flagArray[0], 7);
-		fileAlterPreservation = BitOppereations.testBit(flagArray[0], 6);
-		readOnly = BitOppereations.testBit(flagArray[0], 5);
-		compression = BitOppereations.testBit(flagArray[1], 7);
-		encryption = BitOppereations.testBit(flagArray[1], 6);
-		groupingIdentity = BitOppereations.testBit(flagArray[1], 5);
+		tagAlterPreservation = BitOppereations.testBit(flagArray[0], 0);
+		fileAlterPreservation = BitOppereations.testBit(flagArray[0], 1);
+		readOnly = BitOppereations.testBit(flagArray[0], 2);
+		compression = BitOppereations.testBit(flagArray[1], 0);
+		encryption = BitOppereations.testBit(flagArray[1], 1);
+		groupingIdentity = BitOppereations.testBit(flagArray[1], 2);
 	}
 
 	public String getType() {

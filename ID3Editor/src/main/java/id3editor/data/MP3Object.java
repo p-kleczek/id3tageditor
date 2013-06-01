@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+
 /**
  * The <code>Mp3Object</code> class is a parent class for these files, folders
  * and tags which can be processed by the MP3Tag editor.

@@ -5,6 +5,7 @@ import id3editor.xml.ByteArrayMarshallerAdapter;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+
 /**
  * 
  * @author Pawel, Florian, Sebastian (Gruppe 4)

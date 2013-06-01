@@ -5,7 +5,6 @@ import id3editor.data.tag.PictureFrame;
 import id3editor.data.tag.TextFrame;
 import id3editor.parser.Parser;
 import id3editor.toolbox.BitOppereations;
-import id3editor.toolbox.ByteOpperations;
 import id3editor.xml.ByteArrayMarshallerAdapter;
 
 import java.io.File;
@@ -13,6 +12,7 @@ import java.io.File;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
 
 /**
  * 
@@ -39,7 +39,7 @@ public class MP3File extends MP3Object {
 	}
 
 	/**
-	 * Reads and set the tag informations for the song
+	 * Reads and set the taginformations for the song
 	 * 
 	 * @param the
 	 *            tagheader as bytearray
@@ -47,9 +47,10 @@ public class MP3File extends MP3Object {
 	public void createTag(byte[] tagHeader) {
 		System.arraycopy(tagHeader, 0, fileIdentifier, 0, 3);
 		System.arraycopy(tagHeader, 3, version, 0, 2);
-		unsynchronisation = BitOppereations.testBit(tagHeader[5], 7);
-		extendedHeader = BitOppereations.testBit(tagHeader[5], 6);
-		experimentalIndicator = BitOppereations.testBit(tagHeader[5], 5);
+		unsynchronisation = id3editor.toolbox.BitOppereations.testBit(tagHeader[5], 0);
+		extendedHeader = id3editor.toolbox.BitOppereations.testBit(tagHeader[5], 1);
+		experimentalIndicator = id3editor.toolbox.BitOppereations
+				.testBit(tagHeader[5], 2);
 	}
 
 	@XmlElement(name = "path")
@@ -283,13 +284,13 @@ public class MP3File extends MP3Object {
 		System.arraycopy(version, 0, result, 3, 2);
 
 		if (unsynchronisation)
-			BitOppereations.setBit(result[5], 7);
+			BitOppereations.setBit(result[5], 0);
 
 		if (extendedHeader)
-			BitOppereations.setBit(result[5], 6);
+			BitOppereations.setBit(result[5], 1);
 
 		if (experimentalIndicator)
-			BitOppereations.setBit(result[5], 5);
+			BitOppereations.setBit(result[5], 2);
 
 		System.out.println("getData nach variablen: " + result.length);
 
@@ -306,7 +307,8 @@ public class MP3File extends MP3Object {
 		}
 
 		byte[] tagSize = new byte[4];
-		tagSize = ByteOpperations.convertSynchsafeIntToByte(result.length - 10);
+		tagSize = id3editor.toolbox.ByteOpperations
+				.convertSynchsafeIntToByte(result.length - 10);
 		System.arraycopy(tagSize, 0, result, 6, 4);
 
 		return result;

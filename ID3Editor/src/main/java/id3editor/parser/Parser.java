@@ -7,11 +7,12 @@ import id3editor.data.tag.MP3TagFrame;
 import id3editor.data.tag.PictureFrame;
 import id3editor.data.tag.TextFrame;
 import id3editor.data.tag.URLFrame;
-import id3editor.toolbox.ByteOpperations;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+
+
 
 /**
  * 
@@ -23,7 +24,7 @@ public class Parser {
 		byte[] sizeArray = new byte[4];
 		System.arraycopy(tagHeader, 6, sizeArray, 0, 4);
 
-		return ByteOpperations.convertSynchsafeByteToInt(sizeArray);
+		return id3editor.toolbox.ByteOpperations.convertSynchsafeByteToInt(sizeArray);
 	}
 
 	/**
@@ -38,7 +39,7 @@ public class Parser {
 		byte[] sizeArray = new byte[4];
 		System.arraycopy(frameHeader, 4, sizeArray, 0, 4);
 
-		return ByteOpperations.convertByteToInt(sizeArray);
+		return id3editor.toolbox.ByteOpperations.convertByteToInt(sizeArray);
 	}
 
 	/**

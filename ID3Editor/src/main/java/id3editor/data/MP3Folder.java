@@ -7,6 +7,7 @@ import java.io.File;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+
 /**
  * The <code>MP3Folder </code> class is structure representing a folder on the
  * disc. It serves mainly as a logical unit to easily create navigator tree.
