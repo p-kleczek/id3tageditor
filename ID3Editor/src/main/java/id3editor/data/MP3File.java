@@ -39,7 +39,7 @@ public class MP3File extends MP3Object {
 	}
 
 	/**
-	 * Reads and set the taginformations for the song
+	 * Reads and set the tag informations for the song
 	 * 
 	 * @param the
 	 *            tagheader as bytearray
@@ -47,9 +47,9 @@ public class MP3File extends MP3Object {
 	public void createTag(byte[] tagHeader) {
 		System.arraycopy(tagHeader, 0, fileIdentifier, 0, 3);
 		System.arraycopy(tagHeader, 3, version, 0, 2);
-		unsynchronisation = BitOppereations.testBit(tagHeader[5], 0);
-		extendedHeader = BitOppereations.testBit(tagHeader[5], 1);
-		experimentalIndicator = BitOppereations.testBit(tagHeader[5], 2);
+		unsynchronisation = BitOppereations.testBit(tagHeader[5], 7);
+		extendedHeader = BitOppereations.testBit(tagHeader[5], 6);
+		experimentalIndicator = BitOppereations.testBit(tagHeader[5], 5);
 	}
 
 	@XmlElement(name = "path")
@@ -283,13 +283,13 @@ public class MP3File extends MP3Object {
 		System.arraycopy(version, 0, result, 3, 2);
 
 		if (unsynchronisation)
-			BitOppereations.setBit(result[5], 0);
+			BitOppereations.setBit(result[5], 7);
 
 		if (extendedHeader)
-			BitOppereations.setBit(result[5], 1);
+			BitOppereations.setBit(result[5], 6);
 
 		if (experimentalIndicator)
-			BitOppereations.setBit(result[5], 2);
+			BitOppereations.setBit(result[5], 5);
 
 		System.out.println("getData nach variablen: " + result.length);
 

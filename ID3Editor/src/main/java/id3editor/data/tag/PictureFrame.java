@@ -32,11 +32,11 @@ public class PictureFrame extends MP3TagFrame {
 			"Movie/video screen capture", "A bright coloured fish",
 			"Illustration", "Band/artist logotype", "Publisher/Studio logotype" };
 
-	byte encoding = 0;
-	String mimeType = "";
-	byte picturesType = 0;
-	String description = "";
-	byte[] image = new byte[0];
+	private byte encoding = 0;
+	private String mimeType = "";
+	private byte picturesType = 0;
+	private String description = "";
+	private byte[] image = new byte[0];
 
 	public PictureFrame() {
 	}
@@ -64,7 +64,7 @@ public class PictureFrame extends MP3TagFrame {
 				mimeTypeArray = tmp;
 				offset++;
 			}
-			this.mimeType = new String(mimeTypeArray, ENC_TYPES[(int) encoding]);
+			this.mimeType = new String(mimeTypeArray, ENC_TYPES.get(encoding));
 			offset++;
 
 			this.picturesType = data[offset];
@@ -80,7 +80,7 @@ public class PictureFrame extends MP3TagFrame {
 				offset++;
 			}
 			this.description = new String(descriptionTypeArray,
-					ENC_TYPES[(int) encoding]);
+					ENC_TYPES.get(encoding));
 
 			offset++;
 
@@ -138,8 +138,8 @@ public class PictureFrame extends MP3TagFrame {
 		return encoding;
 	}
 
-	public void setEncoding(byte encoding) {
-		this.encoding = encoding;
+	public void setEncoding(byte i) {
+		this.encoding = i;
 	}
 
 	@XmlElement(name = "mimetype")
@@ -192,7 +192,7 @@ public class PictureFrame extends MP3TagFrame {
 
 		byte[] descriptionBytes = new byte[0];
 		try {
-			descriptionBytes = description.getBytes(ENC_TYPES[(int) encoding]);
+			descriptionBytes = description.getBytes(ENC_TYPES.get(encoding));
 		} catch (Exception e) {
 			System.err.println("Error in TextFrame.getContentBytes()");
 		}

@@ -26,6 +26,14 @@ public class URLFrame extends MP3TagFrame {
 		return new URLFrame(getHeaderBytes(), getContentBytes());
 	}
 
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 	@Override
 	public byte[] getContentBytes() {
 		// URL <text string>

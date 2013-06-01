@@ -1,8 +1,6 @@
 package id3editor.toolbox;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * 
@@ -11,10 +9,10 @@ import java.io.IOException;
 public class ByteOpperations {
 
 	/**
-	 * Convert a syncsafe integer from byte-array to normal integer
+	 * Convert a synchsafe integer from byte-array to normal integer
 	 * 
 	 * @param b
-	 *            the syncsafe integer as byte-array
+	 *            the synchsafe integer as byte-array
 	 * @return the normal integer
 	 */
 	public static int convertSynchsafeByteToInt(byte[] b) {
@@ -36,34 +34,7 @@ public class ByteOpperations {
 	 * @return the integer
 	 */
 	public static int convertByteToInt(byte[] intByteArray) {
-		int size = 0;
-		ByteArrayInputStream arrayInputStream = null;
-		DataInputStream dataInputStream = null;
-
-		try {
-			arrayInputStream = new ByteArrayInputStream(intByteArray);
-			dataInputStream = new DataInputStream(arrayInputStream);
-			size = dataInputStream.readInt();
-		} catch (IOException e) {
-			System.err
-					.println("Failure while create inputstreams in \"convertByteToInt\"");
-			System.err.println(e.toString());
-		} finally {
-			try {
-				if (arrayInputStream != null) {
-					arrayInputStream.close();
-				}
-
-				if (dataInputStream != null) {
-					dataInputStream.close();
-				}
-			} catch (Exception e) {
-				System.err
-						.println("Failure while closing inputstreams in \"convertByteToInt\"");
-				System.err.println(e.toString());
-			}
-		}
-		return size;
+		return ByteBuffer.wrap(intByteArray).getInt();
 	}
 
 	/**
@@ -74,12 +45,9 @@ public class ByteOpperations {
 	 * @return the integer as byte-array
 	 */
 	public static byte[] convertIntToByte(int value) {
-		byte[] result = new byte[4];
-		result[0] = (byte) (value >> 24);
-		result[1] = (byte) ((value << 8) >> 24);
-		result[2] = (byte) ((value << 16) >> 24);
-		result[3] = (byte) ((value << 24) >> 24);
-		return result;
+		ByteBuffer dbuf = ByteBuffer.allocate(4);
+		dbuf.putInt(value);
+		return dbuf.array();
 	}
 
 	/**

@@ -6,12 +6,12 @@ import java.io.UnsupportedEncodingException;
  * 
  * @author Pawel, Florian, Sebastian (Gruppe 4)
  */
-public class CommentFrame extends MP3TagFrame {
+public final class CommentFrame extends MP3TagFrame {
 
-	byte encoding = 0;
-	String language = "";
-	String shortDescription = "";
-	String actualText = "";
+	private byte encoding = 0;
+	private String language = "";
+	private String shortDescription = "";
+	private String actualText = "";
 
 	public CommentFrame() {
 	}
@@ -33,12 +33,12 @@ public class CommentFrame extends MP3TagFrame {
 			byte[] discrArray = new byte[counter];
 			System.arraycopy(content, 4, discrArray, 0, discrArray.length);
 			this.shortDescription = new String(discrArray,
-					ENC_TYPES[(int) encoding]);
+					ENC_TYPES.get(encoding));
 
-			byte[] textArray = new byte[content.length - (5 + counter + 1)];
-			System.arraycopy(content, 6 + counter, textArray, 0,
+			byte[] textArray = new byte[content.length - (5 + counter)];
+			System.arraycopy(content, 5 + counter, textArray, 0,
 					textArray.length);
-			this.actualText = new String(textArray, ENC_TYPES[(int) encoding]);
+			this.actualText = new String(textArray, ENC_TYPES.get(encoding));
 		} catch (UnsupportedEncodingException ex) {
 			System.err.println("Error while decoding commentFrame");
 			System.err.println(ex.toString());
@@ -84,9 +84,9 @@ public class CommentFrame extends MP3TagFrame {
 
 		try {
 			shortDescriptionArray = shortDescription
-					.getBytes(MP3TagFrame.ENC_TYPES[(int) encoding]);
-			actualTextArray = actualText
-					.getBytes(MP3TagFrame.ENC_TYPES[encoding]);
+					.getBytes(MP3TagFrame.ENC_TYPES.get(encoding));
+			actualTextArray = actualText.getBytes(MP3TagFrame.ENC_TYPES
+					.get(encoding));
 		} catch (Exception e) {
 			System.err.println("Error in CommentFrame.getContentBytes");
 		}
@@ -110,6 +110,22 @@ public class CommentFrame extends MP3TagFrame {
 				actualTextArray.length);
 
 		return result;
+	}
+
+	public byte getEncoding() {
+		return encoding;
+	}
+
+	public void setEncoding(byte encoding) {
+		this.encoding = encoding;
+	}
+
+	public void setActualText(String actualText) {
+		this.actualText = actualText;
+	}
+
+	public String getActualText() {
+		return actualText;
 	}
 
 	@Override

@@ -8,6 +8,8 @@ package id3editor.data.tag;
  */
 public abstract class MP3TagFrameTypes {
 
+	// TODO: zamienic na enum z polem typu String
+	
 	public static String AUDIO_ENCRYPTION = "AENC";
 	public static String ATTACHED_PICTURE = "APIC";
 	public static String COMMENTS = "COMM";

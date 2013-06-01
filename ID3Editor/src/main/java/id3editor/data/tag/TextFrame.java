@@ -10,8 +10,8 @@ import javax.xml.bind.annotation.XmlElement;
  */
 public class TextFrame extends MP3TagFrame {
 
-	byte encoding = 0;
-	String text = "";
+	private byte encoding = 0;
+	private String text = "";
 
 	public TextFrame() {
 	}
@@ -25,7 +25,7 @@ public class TextFrame extends MP3TagFrame {
 		System.arraycopy(data, 1, textContent, 0, textContent.length);
 
 		try {
-			text = new String(textContent, ENC_TYPES[(int) encoding]);
+			text = new String(textContent, ENC_TYPES.get(encoding));
 		} catch (UnsupportedEncodingException ex) {
 			System.err.println("Error while decoding textFrame");
 			System.err.println(ex.toString());
@@ -69,7 +69,7 @@ public class TextFrame extends MP3TagFrame {
 		byte[] textBytes = new byte[0];
 
 		try {
-			textBytes = text.getBytes(ENC_TYPES[(int) encoding]);
+			textBytes = text.getBytes(ENC_TYPES.get(encoding));
 		} catch (Exception e) {
 			System.err.println("Error in TextFrame.getContentBytes()");
 		}
