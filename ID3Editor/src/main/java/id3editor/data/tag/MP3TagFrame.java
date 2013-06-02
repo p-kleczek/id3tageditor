@@ -8,8 +8,7 @@ import id3editor.data.MP3Object;
 import id3editor.toolbox.BitOppereations;
 import id3editor.toolbox.ByteOpperations;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlTransient;
 
 public abstract class MP3TagFrame extends MP3Object {
 
@@ -20,12 +19,9 @@ public abstract class MP3TagFrame extends MP3Object {
 	private final static int ENCRYPTION_BIT_NUMBER = 6;
 	private final static int GROUPING_IDENTITY_BIT_NUMBER = 5;
 
-	@XmlElements({
-			@XmlElement(name = "defaultframe", type = DefaultFrame.class),
-			@XmlElement(name = "commentframe", type = CommentFrame.class),
-			@XmlElement(name = "pictureframe", type = PictureFrame.class),
-			@XmlElement(name = "textframe", type = TextFrame.class) })
+	@XmlTransient
 	public static final int HEADER_LENGTH = 10;
+
 	public static final String[] ENC_TYPES = { "ISO-8859-1", "UTF16",
 			"UTF-16BE", "UTF-8" };
 	private String type = "EMPT";

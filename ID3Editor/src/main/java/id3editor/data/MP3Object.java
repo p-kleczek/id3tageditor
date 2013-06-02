@@ -1,6 +1,10 @@
 package id3editor.data;
 
+import id3editor.data.tag.CommentFrame;
+import id3editor.data.tag.DefaultFrame;
 import id3editor.data.tag.MP3TagFrame;
+import id3editor.data.tag.PictureFrame;
+import id3editor.data.tag.TextFrame;
 
 import java.util.ArrayList;
 
@@ -8,7 +12,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
 
 /**
  * The <code>Mp3Object</code> class is a parent class for these files, folders
@@ -21,9 +24,13 @@ public abstract class MP3Object implements Cloneable {
 
 	MP3Object parent = null;
 
-	@XmlElements( { @XmlElement(name = "folder", type = MP3Folder.class),
+	@XmlElements({ @XmlElement(name = "folder", type = MP3Folder.class),
 			@XmlElement(name = "file", type = MP3File.class),
-			@XmlElement(name = "tagframe", type = MP3TagFrame.class) })
+			@XmlElement(name = "tagframe", type = MP3TagFrame.class),
+			@XmlElement(name = "defaultframe", type = DefaultFrame.class),
+			@XmlElement(name = "commentframe", type = CommentFrame.class),
+			@XmlElement(name = "pictureframe", type = PictureFrame.class),
+			@XmlElement(name = "textframe", type = TextFrame.class) })
 	ArrayList<MP3Object> childs = new ArrayList<MP3Object>();
 
 	public MP3Object() {
