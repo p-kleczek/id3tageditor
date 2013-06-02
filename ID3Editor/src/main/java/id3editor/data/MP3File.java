@@ -226,14 +226,13 @@ public class MP3File extends MP3Object {
 	 */
 	public byte[] getCoverPicture() {
 		MP3TagFrame frame = getFrameById(MP3TagFrameTypes.ATTACHED_PICTURE);
-		String coverString = PictureFrame.PIC_TYPES[PictureFrame.COVER_FRONT];
 
 		if (frame == null) {
 			return new byte[0];
 		} else {
 			PictureFrame picFrame = (PictureFrame) frame;
-			return (picFrame.getPictureType().equals(coverString) ? picFrame
-					.getImage() : null);
+			boolean isCoverPicture = picFrame.getPicturesType() == PictureFrame.COVER_FRONT_INDEX;
+			return (isCoverPicture ? picFrame.getImage() : new byte[0]);
 		}
 	}
 
@@ -250,8 +249,8 @@ public class MP3File extends MP3Object {
 
 		if (frame != null) {
 			PictureFrame foundPicFrame = (PictureFrame) frame;
-			String coverString = PictureFrame.PIC_TYPES[PictureFrame.COVER_FRONT];
-			if (foundPicFrame.getPictureType().equals(coverString)) {
+			String coverString = PictureFrame.PICTURE_TYPES[PictureFrame.COVER_FRONT_INDEX];
+			if (foundPicFrame.getPictureDescription().equals(coverString)) {
 				picFrame = foundPicFrame;
 			}
 		}
@@ -260,7 +259,7 @@ public class MP3File extends MP3Object {
 
 		if (picFrame == null) {
 			// No frame and new image - add image frame.
-			addChild(new PictureFrame(PictureFrame.COVER_FRONT, image));
+			addChild(new PictureFrame(PictureFrame.COVER_FRONT_INDEX, image));
 		} else {
 			if (image == null)
 				removeChild(picFrame);

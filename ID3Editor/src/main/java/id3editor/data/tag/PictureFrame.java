@@ -5,38 +5,55 @@ package id3editor.data.tag;
  * @author Pawel, Florian, Sebastian (Gruppe 4)
  */
 
+import static id3editor.toolbox.Constants.NUL_CHAR;
+import id3editor.toolbox.ByteOpperations;
 import id3editor.toolbox.ImageOpperations;
 import id3editor.xml.ByteArrayMarshallerAdapter;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Arrays;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
+ * The <code>CommentFrame</code> class represents an APIC frame.
+ * 
  * @author Gruppe4
  */
 public class PictureFrame extends MP3TagFrame {
 
-	public static byte COVER_FRONT = 3;
+	public static byte COVER_FRONT_INDEX = 3;
 
-	public static final String[] PIC_TYPES = { "Other",
-			"32x32 pixels file icon", "Other file icon", "Cover (front)",
-			"Cover (back)", "Leaflet page", "Media (e.g. lable side of CD)",
-			"Lead artist/lead performer/soloist", "Artist/performer",
-			"Conductor", "Band/Orchestra", "Composer", "Lyricist/text writer",
-			"Recording Location", "During recording", "During performance",
-			"Movie/video screen capture", "A bright coloured fish",
-			"Illustration", "Band/artist logotype", "Publisher/Studio logotype" };
+	public static final String[] PICTURE_TYPES = {
+			"Other",
+			"32x32 pixels file icon",
+			"Other file icon",
+			"Cover (front)",
+			"Cover (back)",
+			"Leaflet page",
+			"Media (e.g. lable side of CD)",
+			"Lead artist/lead performer/soloist",
+			"Artist/performer",
+			"Conductor",
+			"Band/Orchestra",
+			"Composer",
+			"Lyricist/text writer",
+			"Recording Location",
+			"During recording",
+			"During performance",
+			"Movie/video screen capture",
+			"A bright coloured fish",
+			"Illustration",
+			"Band/artist logotype",
+			"Publisher/Studio logotype" };
 
-	private byte encoding = 0;
+	private byte encoding = NUL_CHAR;
 	private String mimeType = "";
-	private byte picturesType = 0;
+	private byte picturesType = NUL_CHAR;
 	private String description = "";
 	private byte[] image = new byte[0];
 
@@ -50,59 +67,33 @@ public class PictureFrame extends MP3TagFrame {
 		// Description <text string according to encoding> $00 (00)
 		// Picture data <binary data>
 		super(frameHeader);
-		try {
-			int offset = 0;
 
-			this.encoding = data[0];
-			offset++;
+		try (ByteArrayInputStream input = new ByteArrayInputStream(data)) {
+			encoding = (byte) input.read();
 
-			byte[] mimeTypeArray = new byte[0];
-			while (data[offset] != 0x00 && offset < data.length) {
-				byte[] tmp = new byte[mimeTypeArray.length + 1];
-				System.arraycopy(mimeTypeArray, 0, tmp, 0, mimeTypeArray.length);
-				tmp[mimeTypeArray.length] = data[offset];
-				mimeTypeArray = tmp;
-				offset++;
-			}
-			this.mimeType = new String(mimeTypeArray, ENCODINGS[(int) encoding]);
-			offset++;
+			byte[] mimeTypeArray = ByteOpperations.readString(input);
+			mimeType = new String(mimeTypeArray, ENCODINGS[encoding]);
 
-			this.picturesType = data[offset];
-			offset++;
+			picturesType = (byte) input.read();
 
-			byte[] descriptionTypeArray = new byte[0];
-			while (data[offset] != 0x00 && offset < data.length) {
-				byte[] tmp = new byte[descriptionTypeArray.length + 1];
-				System.arraycopy(descriptionTypeArray, 0, tmp, 0,
-						descriptionTypeArray.length);
-				tmp[descriptionTypeArray.length] = data[offset];
-				descriptionTypeArray = tmp;
-				offset++;
-			}
-			this.description = new String(descriptionTypeArray,
-					ENCODINGS[(int) encoding]);
+			byte[] descriptionArray = ByteOpperations.readString(input);
+			description = new String(descriptionArray, ENCODINGS[encoding]);
 
-			offset++;
-
-			this.image = new byte[data.length - offset];
-
-			System.arraycopy(data, offset, image, 0, image.length);
-
-		} catch (UnsupportedEncodingException ex) {
-			Logger.getLogger(PictureFrame.class.getName()).log(Level.SEVERE,
-					null, ex);
+			// Text consist of the very last bytes of the content (after $00
+			// byte).
+			int imageOffset = 1 + mimeType.length() + 1 + description.length()
+					+ 1;
+			image = Arrays.copyOfRange(data, imageOffset, data.length);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
 	public PictureFrame(byte pictureType, File image) {
-		super("APIC");
-		this.picturesType = pictureType;
-		setImageFromFile(image);
-		String extension = image.getName().substring(
-				image.getName().lastIndexOf('.') + 1);
+		super(MP3TagFrameTypes.ATTACHED_PICTURE);
 
-		mimeType = "image/" + extension;
-		picturesType = 3; // = Cover (front)
+		// Currently only cover (front) is supported.
+		setImageFromFile(image);
 	}
 
 	@XmlElement(name = "image")
@@ -116,21 +107,14 @@ public class PictureFrame extends MP3TagFrame {
 	}
 
 	public void setImageFromFile(File imageFile) {
-
-		encoding = 0x00;
-
-		String extension = imageFile.getName().substring(
-				imageFile.getName().lastIndexOf('.') + 1);
-		mimeType = "image/" + extension;
-
-		picturesType = 3; // = Cover (front)
-		description = "";
-
-		this.image = ImageOpperations.imageToByteArray(imageFile);
+		encoding = NUL_CHAR;
+		mimeType = "image/" + getExtension(imageFile);
+		picturesType = COVER_FRONT_INDEX;
+		image = ImageOpperations.imageToByteArray(imageFile);
 	}
 
-	public String getPictureType() {
-		return PIC_TYPES[(int) picturesType];
+	public String getPictureDescription() {
+		return PICTURE_TYPES[(int) picturesType];
 	}
 
 	@XmlElement(name = "encoding")
@@ -173,8 +157,7 @@ public class PictureFrame extends MP3TagFrame {
 	public String toString() {
 		return getType() + ": " + "PictureFrame" + " with " + encoding
 				+ " encryption.\nmimeType: " + mimeType + "\npictureType: "
-				+ PIC_TYPES[(int) picturesType] + "\ndescription: "
-				+ description;
+				+ getPictureDescription() + "\ndescription: " + description;
 	}
 
 	@Override
@@ -195,16 +178,19 @@ public class PictureFrame extends MP3TagFrame {
 		try {
 			outputStream.write(encoding);
 			outputStream.write(mimeType.getBytes());
-			outputStream.write((byte) 0x00);
+			outputStream.write(NUL_CHAR);
 			outputStream.write(picturesType);
-			outputStream.write(description.getBytes(ENCODINGS[(int) encoding]));
-			outputStream.write((byte) 0x00);
+			outputStream.write(description.getBytes(ENCODINGS[encoding]));
+			outputStream.write(NUL_CHAR);
 			outputStream.write(image);
 		} catch (IOException e) {
-			System.err.println("Error in CommentFrame.getContentBytes");
+			e.printStackTrace();
 		}
 
 		return outputStream.toByteArray();
 	}
 
+	private String getExtension(File file) {
+		return file.getName().substring(file.getName().lastIndexOf('.') + 1);
+	}
 }

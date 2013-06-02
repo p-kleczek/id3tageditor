@@ -1,5 +1,9 @@
 package id3editor.toolbox;
 
+import static id3editor.toolbox.Constants.NUL_CHAR;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 
 /**
@@ -65,5 +69,21 @@ public class ByteOpperations {
 			j++;
 		}
 		return b;
+	}
+
+	/**
+	 * Reads all bytes until the first occurence of a $00 byte from input
+	 * stream.
+	 * 
+	 * @param input
+	 *            byte input stream
+	 * @return bytes representing an encoded string
+	 */
+	public static byte[] readString(ByteArrayInputStream input) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		int b;
+		while ((b = input.read()) != NUL_CHAR)
+			baos.write(b);
+		return baos.toByteArray();
 	}
 }

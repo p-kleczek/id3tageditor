@@ -2,9 +2,12 @@ package id3editor.data.tag;
 
 import static id3editor.toolbox.Constants.NUL_CHAR;
 
+import id3editor.toolbox.ByteOpperations;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * The <code>CommentFrame</code> class represents a COMM frame.
@@ -26,9 +29,6 @@ public class CommentFrame extends MP3TagFrame {
 	public CommentFrame(byte[] frameHeader, byte[] content) {
 		super(frameHeader);
 
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		int b;
-
 		try (ByteArrayInputStream input = new ByteArrayInputStream(content)) {
 			encoding = (byte) input.read();
 
@@ -36,19 +36,17 @@ public class CommentFrame extends MP3TagFrame {
 			input.read(languageArray);
 			language = new String(languageArray);
 
-			while ((b = input.read()) != NUL_CHAR)
-				baos.write(b);
-			shortDescription = new String(baos.toByteArray(),
-					ENCODINGS[(int) encoding]);
+			byte[] shortDescriptionArray = ByteOpperations.readString(input);
+			shortDescription = new String(shortDescriptionArray,
+					ENCODINGS[encoding]);
 
 			// Text consist of the very last bytes of the content (after $00
 			// byte).
-			int textLength = 0;
-			while (content[content.length - textLength - 1] != NUL_CHAR)
-				textLength++;
-			byte[] actualTextArray = new byte[textLength];
-			input.read(actualTextArray);
-			actualText = new String(actualTextArray, ENCODINGS[(int) encoding]);
+			int textOffset = 1 + LANGUAGE_CODE_SIZE + shortDescription.length()
+					+ 1;
+			byte[] actualTextArray = Arrays.copyOfRange(content, textOffset,
+					content.length);
+			actualText = new String(actualTextArray, ENCODINGS[encoding]);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -95,10 +93,10 @@ public class CommentFrame extends MP3TagFrame {
 			outputStream.write(encoding);
 			outputStream.write(language.getBytes());
 			outputStream.write(shortDescription
-					.getBytes(MP3TagFrame.ENCODINGS[(int) encoding]));
+					.getBytes(MP3TagFrame.ENCODINGS[encoding]));
 			outputStream.write(NUL_CHAR);
 			outputStream.write(actualText
-					.getBytes(MP3TagFrame.ENCODINGS[(int) encoding]));
+					.getBytes(MP3TagFrame.ENCODINGS[encoding]));
 		} catch (Exception e) {
 			System.err.println("Error in CommentFrame.getContentBytes");
 		}

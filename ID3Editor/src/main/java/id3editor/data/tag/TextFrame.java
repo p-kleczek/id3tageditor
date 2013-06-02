@@ -5,14 +5,16 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import javax.xml.bind.annotation.XmlElement;
+import static id3editor.toolbox.Constants.NUL_CHAR;
 
 /**
+ * The <code>TextFrame</code> class represents a Tnnn frame.
  * 
  * @author Pawel, Florian, Sebastian (Gruppe 4)
  */
 public class TextFrame extends MP3TagFrame {
 
-	private byte encoding = 0;
+	private byte encoding = NUL_CHAR;
 	private String text = "";
 
 	public TextFrame() {
@@ -27,10 +29,9 @@ public class TextFrame extends MP3TagFrame {
 		System.arraycopy(data, 1, textContent, 0, textContent.length);
 
 		try {
-			text = new String(textContent, ENCODINGS[(int) encoding]);
-		} catch (UnsupportedEncodingException ex) {
-			System.err.println("Error while decoding textFrame");
-			System.err.println(ex.toString());
+			text = new String(textContent, ENCODINGS[encoding]);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -72,11 +73,11 @@ public class TextFrame extends MP3TagFrame {
 
 		try {
 			outputStream.write(encoding);
-			outputStream.write(text.getBytes(ENCODINGS[(int) encoding]));
+			outputStream.write(text.getBytes(ENCODINGS[encoding]));
 		} catch (IOException e) {
 			System.err.println("Error in CommentFrame.getContentBytes");
 		}
 
-		return outputStream.toByteArray();		
+		return outputStream.toByteArray();
 	}
 }

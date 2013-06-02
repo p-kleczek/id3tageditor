@@ -6,7 +6,7 @@ package id3editor.data.tag;
  * 
  * @author Pawel, Florian, Sebastian (Gruppe 4)
  */
-public abstract class MP3TagFrameTypes {
+public interface MP3TagFrameTypes {
 
 	public static String AUDIO_ENCRYPTION = "AENC";
 	public static String ATTACHED_PICTURE = "APIC";

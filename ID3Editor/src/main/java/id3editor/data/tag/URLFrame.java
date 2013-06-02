@@ -1,6 +1,7 @@
 package id3editor.data.tag;
 
 /**
+ * The <code>URLFrame</code> class represents a Wnnn frame.
  * 
  * @author Pawel, Florian, Sebastian (Gruppe 4)
  */
@@ -37,6 +38,7 @@ public class URLFrame extends MP3TagFrame {
 	@Override
 	public byte[] getContentBytes() {
 		// URL <text string>
+		
 		return url.getBytes();
 	}
 }
