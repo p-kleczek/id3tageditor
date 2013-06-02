@@ -8,6 +8,8 @@ import static id3editor.toolbox.Constants.BITS_PER_BYTE;
 import id3editor.data.MP3Object;
 import id3editor.toolbox.ByteOpperations;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
 
@@ -99,17 +101,19 @@ public abstract class MP3TagFrame extends MP3Object {
 	 * @return frame including frame-header and frame-content as byte[]
 	 */
 	public byte[] getFrameBytes() {
-		byte[] header = getHeaderBytes();
-		byte[] content = getContentBytes();
-
-		byte[] result = new byte[header.length + content.length];
-		System.arraycopy(header, 0, result, 0, HEADER_LENGTH);
-		System.arraycopy(content, 0, result, HEADER_LENGTH, content.length);
-
-		byte[] size = ByteOpperations.convertIntToByte(content.length);
-		System.arraycopy(size, 0, result, 4, size.length);
-
-		return result;
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		
+		try {
+			outputStream.write(getHeaderBytes());
+			
+			byte[] content = getContentBytes();
+			outputStream.write(content);
+			outputStream.write(ByteOpperations.convertIntToByte(content.length));
+		} catch (IOException e) {
+			System.err.println("Error in CommentFrame.getContentBytes");
+		}		
+		
+		return outputStream.toByteArray();
 	}
 
 	public int getContentSize() {

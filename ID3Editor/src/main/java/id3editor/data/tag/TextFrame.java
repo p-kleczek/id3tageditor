@@ -1,5 +1,7 @@
 package id3editor.data.tag;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -66,18 +68,15 @@ public class TextFrame extends MP3TagFrame {
 		// Text encoding $xx
 		// Information <text string according to encoding>
 
-		byte[] textBytes = new byte[0];
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 		try {
-			textBytes = text.getBytes(ENC_TYPES[(int) encoding]);
-		} catch (Exception e) {
-			System.err.println("Error in TextFrame.getContentBytes()");
+			outputStream.write(encoding);
+			outputStream.write(text.getBytes(ENC_TYPES[(int) encoding]));
+		} catch (IOException e) {
+			System.err.println("Error in CommentFrame.getContentBytes");
 		}
 
-		byte[] result = new byte[textBytes.length + 1];
-		System.arraycopy(textBytes, 0, result, 1, textBytes.length);
-		result[0] = encoding;
-
-		return result;
+		return outputStream.toByteArray();		
 	}
 }

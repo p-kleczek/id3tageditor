@@ -1,5 +1,6 @@
 package id3editor.data.tag;
 
+import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -79,37 +80,22 @@ public class CommentFrame extends MP3TagFrame {
 		// Language $xx xx xx
 		// Short content descrip. <text string according to encoding> $00 (00)
 		// The actual text <full text string according to encoding>
-		byte[] shortDescriptionArray = new byte[0];
-		byte[] actualTextArray = new byte[0];
-
+		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		
 		try {
-			shortDescriptionArray = shortDescription
-					.getBytes(MP3TagFrame.ENC_TYPES[(int) encoding]);
-			actualTextArray = actualText
-					.getBytes(MP3TagFrame.ENC_TYPES[encoding]);
+			outputStream.write(encoding);
+			outputStream.write(language.getBytes());
+			outputStream.write(shortDescription
+					.getBytes(MP3TagFrame.ENC_TYPES[(int) encoding]));
+			outputStream.write((byte) 0x00);
+			outputStream.write(actualText
+					.getBytes(MP3TagFrame.ENC_TYPES[(int) encoding]));
 		} catch (Exception e) {
 			System.err.println("Error in CommentFrame.getContentBytes");
 		}
 
-		byte[] result = new byte[5 + shortDescriptionArray.length
-				+ actualTextArray.length];
-
-		int offset = 0;
-
-		result[offset] = encoding;
-		offset++;
-
-		System.arraycopy(language.getBytes(), 0, result, offset, 3);
-		offset += 3;
-
-		System.arraycopy(shortDescriptionArray, 0, result, offset,
-				shortDescription.length());
-		offset += shortDescriptionArray.length + 1;
-
-		System.arraycopy(actualTextArray, 0, result, offset,
-				actualTextArray.length);
-
-		return result;
+		return outputStream.toByteArray();
 	}
 
 	public byte getEncoding() {

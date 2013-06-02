@@ -8,14 +8,15 @@ package id3editor.data.tag;
 import id3editor.toolbox.ImageOpperations;
 import id3editor.xml.ByteArrayMarshallerAdapter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 
 /**
  * @author Gruppe4
@@ -58,9 +59,7 @@ public class PictureFrame extends MP3TagFrame {
 			byte[] mimeTypeArray = new byte[0];
 			while (data[offset] != 0x00 && offset < data.length) {
 				byte[] tmp = new byte[mimeTypeArray.length + 1];
-				System
-						.arraycopy(mimeTypeArray, 0, tmp, 0,
-								mimeTypeArray.length);
+				System.arraycopy(mimeTypeArray, 0, tmp, 0, mimeTypeArray.length);
 				tmp[mimeTypeArray.length] = data[offset];
 				mimeTypeArray = tmp;
 				offset++;
@@ -191,35 +190,21 @@ public class PictureFrame extends MP3TagFrame {
 		// Description <text string according to encoding> $00 (00)
 		// Picture data <binary data>
 
-		byte[] descriptionBytes = new byte[0];
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
 		try {
-			descriptionBytes = description.getBytes(ENC_TYPES[(int) encoding]);
-		} catch (Exception e) {
-			System.err.println("Error in TextFrame.getContentBytes()");
+			outputStream.write(encoding);
+			outputStream.write(mimeType.getBytes());
+			outputStream.write((byte) 0x00);
+			outputStream.write(picturesType);
+			outputStream.write(description.getBytes(ENC_TYPES[(int) encoding]));
+			outputStream.write((byte) 0x00);
+			outputStream.write(image);
+		} catch (IOException e) {
+			System.err.println("Error in CommentFrame.getContentBytes");
 		}
 
-		byte[] result = new byte[4 + mimeType.getBytes().length
-				+ descriptionBytes.length + image.length];
-
-		int offset = 0;
-
-		result[offset] = encoding;
-		offset++;
-
-		System.arraycopy(mimeType.getBytes(), 0, result, offset, mimeType
-				.getBytes().length);
-		offset += mimeType.getBytes().length + 1;
-
-		result[offset] = picturesType;
-		offset++;
-
-		System.arraycopy(descriptionBytes, 0, result, offset,
-				descriptionBytes.length);
-		offset += descriptionBytes.length + 1;
-
-		System.arraycopy(image, 0, result, offset, image.length);
-
-		return result;
+		return outputStream.toByteArray();
 	}
 
 }

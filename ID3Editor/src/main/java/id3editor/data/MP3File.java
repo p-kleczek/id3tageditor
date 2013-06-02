@@ -1,7 +1,6 @@
 package id3editor.data;
 
-import static id3editor.toolbox.Constants.BYTES_PER_INT;
-import static id3editor.toolbox.Constants.TAG_HEADER_LENGTH;
+import static id3editor.toolbox.Constants.BITS_PER_BYTE;
 import id3editor.data.tag.MP3TagFrame;
 import id3editor.data.tag.MP3TagFrameTypes;
 import id3editor.data.tag.PictureFrame;
@@ -10,16 +9,15 @@ import id3editor.parser.Parser;
 import id3editor.toolbox.ByteOpperations;
 import id3editor.xml.ByteArrayMarshallerAdapter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.nio.ByteBuffer;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import static id3editor.toolbox.Constants.BITS_PER_BYTE;
 
 /**
  * The <code>MP3File</code> class represents an ID3v2.3 tag header.
@@ -104,7 +102,8 @@ public class MP3File extends MP3Object {
 
 		fileCopy.file = new File(file.getPath());
 
-		fileCopy.fileIdentifier = Arrays.copyOf(fileIdentifier, fileIdentifier.length);
+		fileCopy.fileIdentifier = Arrays.copyOf(fileIdentifier,
+				fileIdentifier.length);
 		fileCopy.version = Arrays.copyOf(version, version.length);
 		fileCopy.flags = (BitSet) flags.clone();
 
@@ -277,36 +276,32 @@ public class MP3File extends MP3Object {
 	}
 
 	/**
-	 * Converts modified (new) frames into a byte stream. Useful when writing
-	 * into the file.
+	 * Converts modified (new) frames into a byte stream.
 	 * 
 	 * @return modified frames as a byte stream
 	 */
 	public byte[] getBytes() {
-		byte[] result = new byte[TAG_HEADER_LENGTH];
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-		System.arraycopy("ID3".getBytes(), 0, result, 0, 3);
-		System.arraycopy(version, 0, result, 3, version.length);
+		try {
+			outputStream.write("ID3".getBytes());
+			outputStream.write(version);
+			outputStream.write(flags.toByteArray());
 
-		byte[] flagArray = flags.toByteArray();
-		System.arraycopy(flagArray, 0, result, FLAGS_OFFSET, flagArray.length);
+			int framesSize = 0;
+			for (MP3Object objectFrame : childs) {
+				byte[] frameBytes = ((MP3TagFrame) objectFrame).getFrameBytes();
+				framesSize += frameBytes.length;
+				outputStream.write(frameBytes);
+			}
 
-		for (MP3Object objectFrame : childs) {
-
-			MP3TagFrame frame = (MP3TagFrame) objectFrame;
-			byte[] part = frame.getFrameBytes();
-			byte[] buildResult = new byte[result.length + part.length];
-
-			System.arraycopy(result, 0, buildResult, 0, result.length);
-			System.arraycopy(part, 0, buildResult, result.length, part.length);
-			result = buildResult;
+			outputStream.write(ByteOpperations
+					.convertSynchsafeIntToByte(framesSize));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
-		byte[] tagSize = ByteOpperations.convertSynchsafeIntToByte(result.length
-				- TAG_HEADER_LENGTH);
-		System.arraycopy(tagSize, 0, result, 6, tagSize.length);
-
-		return result;
+		return outputStream.toByteArray();
 	}
 
 	/**
