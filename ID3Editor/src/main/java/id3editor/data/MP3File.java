@@ -5,6 +5,7 @@ import id3editor.data.tag.PictureFrame;
 import id3editor.data.tag.TextFrame;
 import id3editor.parser.Parser;
 import id3editor.toolbox.BitOppereations;
+import id3editor.toolbox.ByteOpperations;
 import id3editor.xml.ByteArrayMarshallerAdapter;
 
 import java.io.File;
@@ -19,13 +20,14 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 public class MP3File extends MP3Object {
 
+	private static final int FLAGS_OFFSET = 5;
 	private static final int UNSYNCHRONIZATION_BIT_NUMBER = 7;
 	private static final int EXTENDED_HEADER_BIT_NUMBER = 6;
 	private static final int EXPERIMENTAL_INDICATOR_BIT_NUMBER = 5;
 
-	File path = new File("");
+	private File path = new File("");
 
-	private boolean modified;
+	private boolean modified = false;
 
 	private byte[] fileIdentifier = new byte[3];
 	private byte[] version = new byte[2];
@@ -43,20 +45,20 @@ public class MP3File extends MP3Object {
 	}
 
 	/**
-	 * Reads and set the taginformations for the song
+	 * Reads and set the tag informations for the song
 	 * 
-	 * @param the
-	 *            tagheader as bytearray
+	 * @param tagHeader
+	 *            tag header as byte array
 	 */
 	public void createTag(byte[] tagHeader) {
-		System.arraycopy(tagHeader, 0, fileIdentifier, 0, 3);
-		System.arraycopy(tagHeader, 3, version, 0, 2);
+		System.arraycopy(tagHeader, 0, fileIdentifier, 0, fileIdentifier.length);
+		System.arraycopy(tagHeader, 3, version, 0, version.length);
 		unsynchronisation = id3editor.toolbox.BitOppereations.testBit(
-				tagHeader[5], UNSYNCHRONIZATION_BIT_NUMBER);
+				tagHeader[FLAGS_OFFSET], UNSYNCHRONIZATION_BIT_NUMBER);
 		extendedHeader = id3editor.toolbox.BitOppereations.testBit(
-				tagHeader[5], EXTENDED_HEADER_BIT_NUMBER);
+				tagHeader[FLAGS_OFFSET], EXTENDED_HEADER_BIT_NUMBER);
 		experimentalIndicator = id3editor.toolbox.BitOppereations.testBit(
-				tagHeader[5], EXPERIMENTAL_INDICATOR_BIT_NUMBER);
+				tagHeader[FLAGS_OFFSET], EXPERIMENTAL_INDICATOR_BIT_NUMBER);
 	}
 
 	@XmlElement(name = "path")
@@ -177,8 +179,8 @@ public class MP3File extends MP3Object {
 	 */
 	public String getTextContentByID(String key) {
 		for (MP3Object object : childs) {
-			if (object instanceof TextFrame
-					&& ((MP3TagFrame) object).getType().equals(key)) {
+			String objectType = ((MP3TagFrame) object).getType();
+			if (object instanceof TextFrame && objectType.equals(key)) {
 				return ((TextFrame) object).getText();
 			}
 		}
@@ -245,9 +247,6 @@ public class MP3File extends MP3Object {
 	public void setCoverPicture(File image) {
 		PictureFrame picFrame = null;
 
-		// DEBUG
-		System.out.println("setCover>Piucture");
-
 		// Check is there is already a cover associated with the file.
 		for (MP3Object object : childs) {
 			if (((MP3TagFrame) object).getType().equals("APIC")) {
@@ -287,16 +286,19 @@ public class MP3File extends MP3Object {
 		byte[] result = new byte[10];
 
 		System.arraycopy("ID3".getBytes(), 0, result, 0, 3);
-		System.arraycopy(version, 0, result, 3, 2);
+		System.arraycopy(version, 0, result, 3, version.length);
 
 		if (unsynchronisation)
-			BitOppereations.setBit(result[5], UNSYNCHRONIZATION_BIT_NUMBER);
+			result[5] = BitOppereations.setBit(result[FLAGS_OFFSET],
+					UNSYNCHRONIZATION_BIT_NUMBER);
 
 		if (extendedHeader)
-			BitOppereations.setBit(result[5], EXTENDED_HEADER_BIT_NUMBER);
+			result[5] = BitOppereations.setBit(result[FLAGS_OFFSET],
+					EXTENDED_HEADER_BIT_NUMBER);
 
 		if (experimentalIndicator)
-			BitOppereations.setBit(result[5], EXPERIMENTAL_INDICATOR_BIT_NUMBER);
+			result[5] = BitOppereations.setBit(result[FLAGS_OFFSET],
+					EXPERIMENTAL_INDICATOR_BIT_NUMBER);
 
 		System.out.println("getData nach variablen: " + result.length);
 
@@ -313,8 +315,7 @@ public class MP3File extends MP3Object {
 		}
 
 		byte[] tagSize = new byte[4];
-		tagSize = id3editor.toolbox.ByteOpperations
-				.convertSynchsafeIntToByte(result.length - 10);
+		tagSize = ByteOpperations.convertSynchsafeIntToByte(result.length - 10);
 		System.arraycopy(tagSize, 0, result, 6, 4);
 
 		return result;

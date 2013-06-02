@@ -6,9 +6,8 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Observable;
-
-
-
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * 
@@ -18,7 +17,7 @@ public class Writer extends Observable {
 
 	private static Writer writer = new Writer();
 	private boolean running = false;
-	private ArrayList<MP3File> jobList = new ArrayList<MP3File>();
+	private Queue<Object> jobList = new ConcurrentLinkedQueue<>();
 	private Thread writeThread;
 
 	private Writer() {
@@ -51,10 +50,10 @@ public class Writer extends Observable {
 		@Override
 		public void run() {
 			running = true;
+
 			while (running) {
-				if (jobList.size() > 0) {
-					writeFile(jobList.get(0));
-					jobList.remove(0);
+				if (!jobList.isEmpty()) {
+					writeFile((MP3File) jobList.poll());
 				} else {
 					try {
 						Thread.sleep(1000);

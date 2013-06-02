@@ -4,15 +4,18 @@ import id3editor.data.MP3File;
 import id3editor.data.MP3Object;
 import id3editor.data.tag.DefaultFrame;
 import id3editor.data.tag.MP3TagFrame;
+import id3editor.data.tag.MP3TagFrameTypes;
 import id3editor.data.tag.PictureFrame;
 import id3editor.data.tag.TextFrame;
 import id3editor.data.tag.URLFrame;
+import id3editor.toolbox.ByteOpperations;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-
+import static id3editor.toolbox.Constants.*;
 
 /**
  * 
@@ -21,10 +24,12 @@ import java.util.ArrayList;
 public class Parser {
 
 	public static int getTagSize(byte[] tagHeader) {
-		byte[] sizeArray = new byte[4];
-		System.arraycopy(tagHeader, 6, sizeArray, 0, 4);
+		final int SIZE_CHUNK_OFFSET = 6;
+		byte[] sizeArray = new byte[BYTES_PER_INT];
+		System.arraycopy(tagHeader, SIZE_CHUNK_OFFSET, sizeArray, 0,
+				BYTES_PER_INT);
 
-		return id3editor.toolbox.ByteOpperations.convertSynchsafeByteToInt(sizeArray);
+		return ByteOpperations.convertSynchsafeByteToInt(sizeArray);
 	}
 
 	/**
@@ -36,10 +41,8 @@ public class Parser {
 	 *             - while reading sizeArray in convertByteToInt
 	 */
 	private static int getFrameSize(byte[] frameHeader) throws IOException {
-		byte[] sizeArray = new byte[4];
-		System.arraycopy(frameHeader, 4, sizeArray, 0, 4);
-
-		return id3editor.toolbox.ByteOpperations.convertByteToInt(sizeArray);
+		final int SIZE_CHUNK_OFFSET = 4;
+		return ByteBuffer.wrap(frameHeader).getInt(SIZE_CHUNK_OFFSET);
 	}
 
 	/**
@@ -52,7 +55,7 @@ public class Parser {
 		try {
 			RandomAccessFile raf = new RandomAccessFile(file.getFilePath(), "r");
 
-			byte[] tagHeader = new byte[10];
+			byte[] tagHeader = new byte[TAG_HEADER_LENGTH];
 			raf.read(tagHeader);
 
 			file.createTag(tagHeader);
@@ -82,25 +85,30 @@ public class Parser {
 	 */
 	private static ArrayList<MP3TagFrame> parseTagContent(byte[] content)
 			throws IOException {
+
 		ArrayList<MP3TagFrame> result = new ArrayList<MP3TagFrame>();
-		int counter = 0;
-		while (counter + 10 < content.length && content[counter + 1] != 0x00) {
-			byte[] frameHeader = new byte[10];
-			System.arraycopy(content, counter, frameHeader, 0, 10);
+		int offset = 0;
+
+		while (offset + TAG_HEADER_LENGTH < content.length
+				&& content[offset + 1] != 0x00) {
+			byte[] frameHeader = new byte[TAG_HEADER_LENGTH];
+			System.arraycopy(content, offset, frameHeader, 0, TAG_HEADER_LENGTH);
 
 			int frameSize = getFrameSize(frameHeader);
 			byte[] frameContent = new byte[frameSize];
-			System.arraycopy(content, counter + 10, frameContent, 0,
+			System.arraycopy(content, offset + TAG_HEADER_LENGTH, frameContent, 0,
 					frameContent.length);
 
-			if (new String(frameHeader).startsWith("T")) {
+			// TODO : wykorzystac istniejace metody (getType())
+			String frameType = (new DefaultFrame(frameHeader, null)).getType();
+			if (frameType.startsWith("T")) {
 				TextFrame textFrame = new TextFrame(frameHeader, frameContent);
 				result.add(textFrame);
-			} else if (new String(frameHeader).startsWith("W")) {
+			} else if (frameType.startsWith("W")) {
 				URLFrame urlFrame = new URLFrame(frameHeader, frameContent);
 				result.add(urlFrame);
 				// TODO repair and test the commentFrame
-			} else if (new String(frameHeader).startsWith("APIC")) {
+			} else if (frameType.equals(MP3TagFrameTypes.ATTACHED_PICTURE)) {
 				PictureFrame pictureFrame = new PictureFrame(frameHeader,
 						frameContent);
 				result.add(pictureFrame);
@@ -108,7 +116,8 @@ public class Parser {
 				MP3TagFrame frame = new DefaultFrame(frameHeader, frameContent);
 				result.add(frame);
 			}
-			counter += 10 + frameContent.length;
+
+			offset += TAG_HEADER_LENGTH + frameContent.length;
 		}
 
 		return result;
