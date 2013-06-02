@@ -29,7 +29,7 @@ import net.iharder.dnd.FileDrop;
 public class Application extends javax.swing.JFrame implements Observer {
 
 	public final ImageIcon noCoverImageIcon = new ImageIcon(getClass()
-			.getResource("/images/noCover.png"));
+			.getResource("/images/noCover.png")); //$NON-NLS-1$
 
 	private static Application application = new Application();
 
@@ -100,7 +100,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 		exitMenuItem = new javax.swing.JMenuItem();
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-		setTitle("ID3Tag Editor   (by Florian, Sebastian and Pawel)       MPGI4 WiSe 2011-12");
+		setTitle("ID3Tag Editor   (by Florian, Sebastian and Pawel)       MPGI4 WiSe 2011-12"); //$NON-NLS-1$
 		setIconImages(null);
 
 		// TreePanel
@@ -120,21 +120,21 @@ public class Application extends javax.swing.JFrame implements Observer {
 		splitPane.setLeftComponent(treeScrollPane);
 
 		// setup labels
-		titleLabel.setFont(new java.awt.Font("Tahoma", 0, 14));
-		titleLabel.setText("Titel:");
-		artistLabel.setFont(new java.awt.Font("Tahoma", 0, 14));
-		artistLabel.setText("Interpret:");
-		albumLabel.setFont(new java.awt.Font("Tahoma", 0, 14));
-		albumLabel.setText("Album:");
-		yearLabel.setFont(new java.awt.Font("Tahoma", 0, 14));
-		yearLabel.setText("Jahr:");
-		yearLabel.setToolTipText("");
-		CoverLabel.setFont(new java.awt.Font("Tahoma", 0, 14));
-		CoverLabel.setText("Cover:");
+		titleLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
+		titleLabel.setText(""); //$NON-NLS-1$
+		artistLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
+		artistLabel.setText(""); //$NON-NLS-1$
+		albumLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
+		albumLabel.setText(""); //$NON-NLS-1$
+		yearLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
+		yearLabel.setText(""); //$NON-NLS-1$
+		yearLabel.setToolTipText(""); //$NON-NLS-1$
+		CoverLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
+		CoverLabel.setText(""); //$NON-NLS-1$
 		CoverImageLabel.setIcon(noCoverImageIcon);
 
 		// setup textfields
-		titleTextField.setFont(new java.awt.Font("Tahoma", 0, 14));
+		titleTextField.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
 		titleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
 
 			@Override
@@ -143,7 +143,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 			}
 		});
 
-		artistTextField.setFont(new java.awt.Font("Tahoma", 0, 14));
+		artistTextField.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
 		artistTextField.addKeyListener(new java.awt.event.KeyAdapter() {
 
 			@Override
@@ -152,7 +152,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 			}
 		});
 
-		albumTextField.setFont(new java.awt.Font("Tahoma", 0, 14));
+		albumTextField.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
 		albumTextField.addKeyListener(new java.awt.event.KeyAdapter() {
 
 			@Override
@@ -161,7 +161,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 			}
 		});
 
-		yearTextField.setFont(new java.awt.Font("Tahoma", 0, 14));
+		yearTextField.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
 		yearTextField.addKeyListener(new java.awt.event.KeyAdapter() {
 
 			@Override
@@ -170,8 +170,8 @@ public class Application extends javax.swing.JFrame implements Observer {
 			}
 		});
 
-		changeCoverButton.setText("\u00C4ndern");
-		changeCoverButton.setActionCommand("CHANGE_COVER");
+		changeCoverButton.setText(Captions.getString("App.change")); //$NON-NLS-1$
+		changeCoverButton.setActionCommand("CHANGE_COVER"); //$NON-NLS-1$
 		changeCoverButton
 				.addActionListener(new java.awt.event.ActionListener() {
 
@@ -180,8 +180,8 @@ public class Application extends javax.swing.JFrame implements Observer {
 					}
 				});
 
-		deleteCoverButton.setText("L\u00F6schen");
-		deleteCoverButton.setActionCommand("DELETE_COVER");
+		deleteCoverButton.setText(Captions.getString("App.clear")); //$NON-NLS-1$
+		deleteCoverButton.setActionCommand("DELETE_COVER"); //$NON-NLS-1$
 		deleteCoverButton
 				.addActionListener(new java.awt.event.ActionListener() {
 
@@ -342,7 +342,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 																javax.swing.GroupLayout.PREFERRED_SIZE))
 										.addContainerGap(12, Short.MAX_VALUE)));
 
-		tabPanel.addTab("Dateiansicht", fileTab);
+		tabPanel.addTab(Captions.getString("App.dataView"), fileTab); //$NON-NLS-1$
 
 		folderTable.setAutoCreateRowSorter(true);
 		folderTable.setModel(Model.getModel().getTableModel());
@@ -352,10 +352,10 @@ public class Application extends javax.swing.JFrame implements Observer {
 				java.awt.Cursor.DEFAULT_CURSOR));
 		folderTab.setViewportView(folderTable);
 
-		tabPanel.addTab("Ordneransicht", folderTab);
+		tabPanel.addTab(Captions.getString("App.folderView"), folderTab); //$NON-NLS-1$
 
-		startPlayerButton.setText("Start");
-		startPlayerButton.setActionCommand("START_PLAYER");
+		startPlayerButton.setText(Captions.getString("App.play")); //$NON-NLS-1$
+		startPlayerButton.setActionCommand("START_PLAYER"); //$NON-NLS-1$
 		startPlayerButton
 				.addActionListener(new java.awt.event.ActionListener() {
 
@@ -364,8 +364,8 @@ public class Application extends javax.swing.JFrame implements Observer {
 					}
 				});
 
-		stopPlayerButton.setText("Stop");
-		stopPlayerButton.setActionCommand("STOP_PLAYER");
+		stopPlayerButton.setText(Captions.getString("App.stop")); //$NON-NLS-1$
+		stopPlayerButton.setActionCommand("STOP_PLAYER"); //$NON-NLS-1$
 		stopPlayerButton.addActionListener(new java.awt.event.ActionListener() {
 
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -373,8 +373,8 @@ public class Application extends javax.swing.JFrame implements Observer {
 			}
 		});
 
-		playerSongLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-		playerSongLabel.setText("Es wird gerade nichts gespielt...");
+		playerSongLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N //$NON-NLS-1$
+		playerSongLabel.setText(Captions.getString("App.nothingIsPlayer")); //$NON-NLS-1$
 
 		javax.swing.GroupLayout playerTabLayout = new javax.swing.GroupLayout(
 				playerTab);
@@ -432,21 +432,21 @@ public class Application extends javax.swing.JFrame implements Observer {
 										.addContainerGap()));
 
 		startPlayerButton.getAccessibleContext().setAccessibleName(
-				"startButton");
-		stopPlayerButton.getAccessibleContext().setAccessibleName("stopButton");
-		playerSongLabel.getAccessibleContext().setAccessibleName("");
+				"startButton"); //$NON-NLS-1$
+		stopPlayerButton.getAccessibleContext().setAccessibleName("stopButton"); //$NON-NLS-1$
+		playerSongLabel.getAccessibleContext().setAccessibleName(""); //$NON-NLS-1$
 
-		tabPanel.addTab("Wiedergabe(Experimentell)", playerTab);
+		tabPanel.addTab(Captions.getString("App.player"), playerTab); //$NON-NLS-1$
 
 		splitPane.setRightComponent(tabPanel);
 
-		firstMenu.setText("Datei");
+		firstMenu.setText(Captions.getString("App.plik")); //$NON-NLS-1$
 
 		addFolderMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
 				java.awt.event.KeyEvent.VK_PLUS,
 				java.awt.event.InputEvent.CTRL_MASK));
-		addFolderMenuItem.setText("Ordner hinzuf\u00FCgen");
-		addFolderMenuItem.setActionCommand("ADD_FOLDER_MENU");
+		addFolderMenuItem.setText(Captions.getString("App.addFolder")); //$NON-NLS-1$
+		addFolderMenuItem.setActionCommand("ADD_FOLDER_MENU"); //$NON-NLS-1$
 		addFolderMenuItem
 				.addActionListener(new java.awt.event.ActionListener() {
 
@@ -459,8 +459,8 @@ public class Application extends javax.swing.JFrame implements Observer {
 		saveChangesMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
 				java.awt.event.KeyEvent.VK_S,
 				java.awt.event.InputEvent.CTRL_MASK));
-		saveChangesMenuItem.setText("\u00C4nderungen speichern");
-		saveChangesMenuItem.setActionCommand("SAVE_MENU");
+		saveChangesMenuItem.setText(Captions.getString("App.saveChanges")); //$NON-NLS-1$
+		saveChangesMenuItem.setActionCommand("SAVE_MENU"); //$NON-NLS-1$
 		saveChangesMenuItem
 				.addActionListener(new java.awt.event.ActionListener() {
 
@@ -475,8 +475,8 @@ public class Application extends javax.swing.JFrame implements Observer {
 		exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
 				java.awt.event.KeyEvent.VK_ESCAPE,
 				java.awt.event.InputEvent.CTRL_MASK));
-		exitMenuItem.setText("Exit");
-		exitMenuItem.setActionCommand("EXIT_MENU");
+		exitMenuItem.setText(Captions.getString("App.exit")); //$NON-NLS-1$
+		exitMenuItem.setActionCommand("EXIT_MENU"); //$NON-NLS-1$
 		exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
 
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -541,7 +541,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 			}
 			if (yearTextField == tf) {
 				String year = yearTextField.getText();
-				String id3YearPattern = "([1-9][0-9]{3})|(^$)";
+				String id3YearPattern = "([1-9][0-9]{3})|(^$)"; //$NON-NLS-1$
 
 				if (Pattern.matches(id3YearPattern, year)) {
 					yearTextField.setBackground(Color.white);
@@ -562,7 +562,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 		try {
 			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager
 					.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
+				if ("Nimbus".equals(info.getName())) { //$NON-NLS-1$
 					javax.swing.UIManager.setLookAndFeel(info.getClassName());
 					break;
 
@@ -653,10 +653,10 @@ public class Application extends javax.swing.JFrame implements Observer {
 				deleteCoverButton.setEnabled(true);
 
 		} else {
-			titleTextField.setText("");
-			artistTextField.setText("");
-			albumTextField.setText("");
-			yearTextField.setText("");
+			titleTextField.setText(""); //$NON-NLS-1$
+			artistTextField.setText(""); //$NON-NLS-1$
+			albumTextField.setText(""); //$NON-NLS-1$
+			yearTextField.setText(""); //$NON-NLS-1$
 			yearTextField.setBackground(Color.white);
 
 			CoverImageLabel.setIcon(noCoverImageIcon);
@@ -665,11 +665,9 @@ public class Application extends javax.swing.JFrame implements Observer {
 
 	public void updatePlayer() {
 		if (MP3Player.getMP3Player().isPlaying()) {
-			playerSongLabel.setText("Es wird gereade "
-					+ MP3Player.getMP3Player().getActualTitle()
-					+ " gespielt...");
+			playerSongLabel.setText(Captions.getString("App.nowPlaying", MP3Player.getMP3Player().getActualTitle())); //$NON-NLS-1$
 		} else {
-			playerSongLabel.setText("Es wird gerade nichts gespielt...");
+			playerSongLabel.setText(Captions.getString("App.nothingIsPlayer")); //$NON-NLS-1$
 		}
 	}
 
