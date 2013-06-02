@@ -20,7 +20,6 @@ public class MP3Folder extends MP3Object {
 	File path = new File("");
 
 	public MP3Folder() {
-
 	}
 
 	@XmlElement(name = "path")
@@ -36,11 +35,11 @@ public class MP3Folder extends MP3Object {
 	 * Constructor for a Mp3Folder witch creates the complete treestrukture and
 	 * parse the Mp3Files.
 	 * 
-	 * @param pathname
+	 * @param path
 	 *            . Path to the root-Folder
 	 */
-	public MP3Folder(String pathname) {
-		this.path = new File(pathname);
+	public MP3Folder(String path) {
+		this.path = new File(path);
 		readChildsFromDisc();
 	}
 

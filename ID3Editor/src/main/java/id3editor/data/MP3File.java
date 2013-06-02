@@ -9,6 +9,7 @@ import id3editor.parser.Parser;
 import id3editor.toolbox.ByteOpperations;
 import id3editor.xml.ByteArrayMarshallerAdapter;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +27,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 public class MP3File extends MP3Object {
 
-	private static final int FLAGS_OFFSET = 5;
+	private static final int FILE_IDENTIFIER_BYTES = 3;
+	private static final int VERSION_BYTES = 2;
+	private static final int FLAG_BYTES = 1;
 
 	public static enum Flag {
 		UNSYNCHRONIZATION(7), EXTENDED_HEADER(6), EXPERIMENTAL_INDICATOR(5);
@@ -42,18 +45,16 @@ public class MP3File extends MP3Object {
 
 	private boolean modified = false;
 
-	private byte[] fileIdentifier = new byte[3];
-	private byte[] version = new byte[2];
+	private byte[] fileIdentifier = new byte[FILE_IDENTIFIER_BYTES];
+	private byte[] version = new byte[VERSION_BYTES];
 
-	private BitSet flags = new BitSet(BITS_PER_BYTE);
+	private BitSet flags = new BitSet(FLAG_BYTES * BITS_PER_BYTE);
 
 	public MP3File() {
 	}
 
 	public MP3File(String pathname) {
 		this.file = new File(pathname);
-
-		modified = false;
 	}
 
 	/**
@@ -63,10 +64,16 @@ public class MP3File extends MP3Object {
 	 *            tag header as byte array
 	 */
 	public void createTag(byte[] tagHeader) {
-		System.arraycopy(tagHeader, 0, fileIdentifier, 0, fileIdentifier.length);
-		System.arraycopy(tagHeader, 3, version, 0, version.length);
-		flags = BitSet.valueOf(Arrays.copyOfRange(tagHeader, FLAGS_OFFSET,
-				FLAGS_OFFSET + 1));
+		try (ByteArrayInputStream input = new ByteArrayInputStream(tagHeader)) {
+			input.read(fileIdentifier);
+			input.read(version);
+
+			byte[] flagArray = new byte[FLAG_BYTES];
+			input.read(flagArray);
+			flags = BitSet.valueOf(flagArray);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@XmlElement(name = "path")
@@ -78,30 +85,17 @@ public class MP3File extends MP3Object {
 		this.file = path;
 	}
 
-	/**
-	 * Marks modified files.
-	 */
 	@Override
 	public String toString() {
-		String nodeName = this.file.getName();
-
-		if (isModified()) {
-			nodeName = "(*) " + nodeName;
-		}
-
-		return nodeName;
+		String modificationMarker = isModified() ? "(*) " : "";
+		return String.format("%s%s", modificationMarker, file.getName());
 	}
 
-	/**
-	 * Makes a deep copy of the file's data.
-	 */
 	@Override
 	public Object clone() {
-
 		MP3File fileCopy = new MP3File();
 
 		fileCopy.file = new File(file.getPath());
-
 		fileCopy.fileIdentifier = Arrays.copyOf(fileIdentifier,
 				fileIdentifier.length);
 		fileCopy.version = Arrays.copyOf(version, version.length);
@@ -266,10 +260,10 @@ public class MP3File extends MP3Object {
 
 		if (picFrame == null) {
 			// No frame and new image - add image frame.
-			this.addChild(new PictureFrame(PictureFrame.COVER_FRONT, image));
+			addChild(new PictureFrame(PictureFrame.COVER_FRONT, image));
 		} else {
 			if (image == null)
-				this.removeChild(picFrame);
+				removeChild(picFrame);
 			else
 				picFrame.setImageFromFile(image);
 		}
@@ -310,7 +304,7 @@ public class MP3File extends MP3Object {
 	@Override
 	public void checkForUpdate(double cacheTimestamp) {
 		if (file.lastModified() > cacheTimestamp) {
-			this.removeAllChilds();
+			removeAllChilds();
 			Parser.parseMP3File(this);
 		}
 	}

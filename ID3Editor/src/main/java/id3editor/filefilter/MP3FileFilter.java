@@ -13,8 +13,8 @@ public class MP3FileFilter extends FileFilter {
 
 	@Override
 	public boolean accept(File file) {
-		String path = file.getAbsolutePath().toLowerCase();
-		return (path.endsWith(".mp3"));
+		String fileName = file.getName().toLowerCase();
+		return (fileName.endsWith(".mp3"));
 	}
 
 	@Override

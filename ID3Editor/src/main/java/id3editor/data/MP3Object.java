@@ -24,7 +24,8 @@ public abstract class MP3Object implements Cloneable {
 
 	MP3Object parent = null;
 
-	@XmlElements({ @XmlElement(name = "folder", type = MP3Folder.class),
+	@XmlElements({
+			@XmlElement(name = "folder", type = MP3Folder.class),
 			@XmlElement(name = "file", type = MP3File.class),
 			@XmlElement(name = "tagframe", type = MP3TagFrame.class),
 			@XmlElement(name = "defaultframe", type = DefaultFrame.class),
@@ -77,5 +78,6 @@ public abstract class MP3Object implements Cloneable {
 	 * @param cacheTimestamp
 	 */
 	public void checkForUpdate(double cacheTimestamp) {
+		throw new UnsupportedOperationException();
 	}
 }

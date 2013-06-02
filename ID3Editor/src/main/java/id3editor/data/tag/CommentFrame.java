@@ -1,7 +1,11 @@
 package id3editor.data.tag;
 
+import static id3editor.toolbox.Constants.NUL_CHAR;
+
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
+
 
 /**
  * 
@@ -9,6 +13,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class CommentFrame extends MP3TagFrame {
 
+	private static final int LANGUAGE_CODE_SIZE = 3;
 	private byte encoding = 0;
 	private String language = "";
 	private String shortDescription = "";
@@ -19,30 +24,31 @@ public class CommentFrame extends MP3TagFrame {
 
 	public CommentFrame(byte[] frameHeader, byte[] content) {
 		super(frameHeader);
-		this.encoding = content[0];
-
-		byte[] languageArray = new byte[3];
-		System.arraycopy(content, 1, languageArray, 0, 3);
-		this.language = new String(languageArray);
-
-		int counter = 0;
-		while (content[4 + counter] != 0x00) {
-			counter++;
-		}
-
-		try {
-			byte[] discrArray = new byte[counter];
-			System.arraycopy(content, 4, discrArray, 0, discrArray.length);
-			this.shortDescription = new String(discrArray,
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		int b;
+		
+		try (ByteArrayInputStream input = new ByteArrayInputStream(content)) {
+			encoding = (byte) input.read();
+			
+			byte[] languageArray = new byte[LANGUAGE_CODE_SIZE];
+			input.read(languageArray);
+			language = new String(languageArray);
+			
+			while ((b = input.read()) != NUL_CHAR)
+				baos.write(b);
+			shortDescription = new String(baos.toByteArray(),
 					ENC_TYPES[(int) encoding]);
 
-			byte[] textArray = new byte[content.length - (5 + counter)];
-			System.arraycopy(content, 5 + counter, textArray, 0,
-					textArray.length);
-			this.actualText = new String(textArray, ENC_TYPES[(int) encoding]);
-		} catch (UnsupportedEncodingException ex) {
-			System.err.println("Error while decoding commentFrame");
-			System.err.println(ex.toString());
+			int textLength = 0;
+			while (content[content.length - textLength - 1] != NUL_CHAR)
+				textLength++;
+			
+			byte[] actualTextArray = new byte[textLength];
+			input.read(actualTextArray);
+			actualText = new String(actualTextArray, ENC_TYPES[(int) encoding]);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -88,7 +94,7 @@ public class CommentFrame extends MP3TagFrame {
 			outputStream.write(language.getBytes());
 			outputStream.write(shortDescription
 					.getBytes(MP3TagFrame.ENC_TYPES[(int) encoding]));
-			outputStream.write((byte) 0x00);
+			outputStream.write(NUL_CHAR);
 			outputStream.write(actualText
 					.getBytes(MP3TagFrame.ENC_TYPES[(int) encoding]));
 		} catch (Exception e) {
