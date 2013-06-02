@@ -239,10 +239,10 @@ public class Control extends Observable {
 
 		switch (actionCommand) {
 		case "START_PLAYER":
-			MP3Player.getMP3Player().playSong(Model.getModel().getFileInWork());
+			MP3Player.getInstance().playSong(Model.getModel().getFileInWork());
 			break;
 		case "STOP_PLAYER":
-			MP3Player.getMP3Player().stopSong();
+			MP3Player.getInstance().stopSong();
 			break;
 		default:
 			throw new IllegalArgumentException(

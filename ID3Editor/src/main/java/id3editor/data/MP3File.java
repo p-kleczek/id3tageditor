@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
+ * The <code>MP3File</code> class represents an ID3v2.3 tag header.
  * 
  * @author Pawel, Florian, Sebastian (Gruppe 4)
  */
@@ -28,7 +29,7 @@ public class MP3File extends MP3Object {
 	private static final int EXTENDED_HEADER_BIT_NUMBER = 6;
 	private static final int EXPERIMENTAL_INDICATOR_BIT_NUMBER = 5;
 
-	private File path = new File("");
+	private File file = new File("");
 
 	private boolean modified = false;
 
@@ -42,13 +43,13 @@ public class MP3File extends MP3Object {
 	}
 
 	public MP3File(String pathname) {
-		this.path = new File(pathname);
+		this.file = new File(pathname);
 
 		modified = false;
 	}
 
 	/**
-	 * Parses ID3v2 tag header.
+	 * Parses ID3v2.3 tag header.
 	 * 
 	 * @param tagHeader
 	 *            tag header as byte array
@@ -65,12 +66,12 @@ public class MP3File extends MP3Object {
 	}
 
 	@XmlElement(name = "path")
-	public File getFilePath() {
-		return path;
+	public File getFile() {
+		return file;
 	}
 
-	public void setFilePath(File path) {
-		this.path = path;
+	public void setFile(File file) {
+		this.file = file;
 	}
 
 	/**
@@ -78,7 +79,7 @@ public class MP3File extends MP3Object {
 	 */
 	@Override
 	public String toString() {
-		String nodeName = this.path.getName();
+		String nodeName = this.file.getName();
 
 		if (isModified()) {
 			nodeName = "(*) " + nodeName;
@@ -95,7 +96,7 @@ public class MP3File extends MP3Object {
 
 		MP3File fileCopy = new MP3File();
 
-		fileCopy.setFilePath(path);
+		fileCopy.setFile(file);
 
 		fileCopy.fileIdentifier = new byte[fileIdentifier.length];
 		System.arraycopy(fileIdentifier, 0, fileCopy.fileIdentifier, 0,
@@ -234,12 +235,13 @@ public class MP3File extends MP3Object {
 	public byte[] getCoverPicture() {
 		MP3TagFrame frame = getFrameById(MP3TagFrameTypes.ATTACHED_PICTURE);
 		String coverString = PictureFrame.PIC_TYPES[PictureFrame.COVER_FRONT];
-		
+
 		if (frame == null) {
 			return new byte[0];
 		} else {
 			PictureFrame picFrame = (PictureFrame) frame;
-			return (picFrame.getPictureType().equals(coverString) ? picFrame.getImage() : null);
+			return (picFrame.getPictureType().equals(coverString) ? picFrame
+					.getImage() : null);
 		}
 	}
 
@@ -253,7 +255,7 @@ public class MP3File extends MP3Object {
 	public void setCoverPicture(File image) {
 		PictureFrame picFrame = null;
 		MP3TagFrame frame = getFrameById(MP3TagFrameTypes.ATTACHED_PICTURE);
-		
+
 		if (frame != null) {
 			PictureFrame foundPicFrame = (PictureFrame) frame;
 			String coverString = PictureFrame.PIC_TYPES[PictureFrame.COVER_FRONT];
@@ -311,7 +313,8 @@ public class MP3File extends MP3Object {
 		}
 
 		byte[] tagSize = new byte[BYTES_PER_INT];
-		tagSize = ByteOpperations.convertSynchsafeIntToByte(result.length - TAG_HEADER_LENGTH);
+		tagSize = ByteOpperations.convertSynchsafeIntToByte(result.length
+				- TAG_HEADER_LENGTH);
 		System.arraycopy(tagSize, 0, result, 6, tagSize.length);
 
 		return result;
@@ -322,7 +325,7 @@ public class MP3File extends MP3Object {
 	 */
 	@Override
 	public void checkForUpdate(double cacheTimestamp) {
-		if (path.lastModified() > cacheTimestamp) {
+		if (file.lastModified() > cacheTimestamp) {
 			this.removeAllChilds();
 			Parser.parseMP3File(this);
 		}

@@ -49,7 +49,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 		Application.getApplication().setVisible(true);
 		Control.getControl().addObserver(Application.getApplication());
 		Writer.getWriter().addObserver(Application.getApplication());
-		MP3Player.getMP3Player().addObserver(Application.getApplication());
+		MP3Player.getInstance().addObserver(Application.getApplication());
 	}
 
 	private void initComponents() {
@@ -78,8 +78,8 @@ public class Application extends javax.swing.JFrame implements Observer {
 		artistLabel = new javax.swing.JLabel();
 		albumLabel = new javax.swing.JLabel();
 		yearLabel = new javax.swing.JLabel();
-		CoverLabel = new javax.swing.JLabel();
-		CoverImageLabel = new javax.swing.JLabel();
+		coverLabel = new javax.swing.JLabel();
+		coverImageLabel = new javax.swing.JLabel();
 		playerSongLabel = new javax.swing.JLabel();
 		// textfields
 		titleTextField = new javax.swing.JTextField();
@@ -129,9 +129,9 @@ public class Application extends javax.swing.JFrame implements Observer {
 		yearLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
 		yearLabel.setText(""); //$NON-NLS-1$
 		yearLabel.setToolTipText(""); //$NON-NLS-1$
-		CoverLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
-		CoverLabel.setText(""); //$NON-NLS-1$
-		CoverImageLabel.setIcon(noCoverImageIcon);
+		coverLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
+		coverLabel.setText(""); //$NON-NLS-1$
+		coverImageLabel.setIcon(noCoverImageIcon);
 
 		// setup textfields
 		titleTextField.setFont(new java.awt.Font("Tahoma", 0, 14)); //$NON-NLS-1$
@@ -189,7 +189,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 						changeCoverButtonActionPerformed(evt);
 
 						deleteCoverButton.setEnabled(false);
-						CoverImageLabel.setIcon(noCoverImageIcon);
+						coverImageLabel.setIcon(noCoverImageIcon);
 					}
 				});
 
@@ -216,7 +216,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 																albumLabel)
 														.addComponent(yearLabel)
 														.addComponent(
-																CoverLabel))
+																coverLabel))
 										.addGap(18, 18, 18)
 										.addGroup(
 												fileTabLayout
@@ -237,7 +237,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 																fileTabLayout
 																		.createSequentialGroup()
 																		.addComponent(
-																				CoverImageLabel,
+																				coverImageLabel,
 																				javax.swing.GroupLayout.PREFERRED_SIZE,
 																				150,
 																				javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -334,9 +334,9 @@ public class Application extends javax.swing.JFrame implements Observer {
 																				8,
 																				8)
 																		.addComponent(
-																				CoverLabel))
+																				coverLabel))
 														.addComponent(
-																CoverImageLabel,
+																coverImageLabel,
 																javax.swing.GroupLayout.PREFERRED_SIZE,
 																150,
 																javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -584,8 +584,8 @@ public class Application extends javax.swing.JFrame implements Observer {
 		// </editor-fold>
 	}
 
-	private javax.swing.JLabel CoverImageLabel;
-	private javax.swing.JLabel CoverLabel;
+	private javax.swing.JLabel coverImageLabel;
+	private javax.swing.JLabel coverLabel;
 	private javax.swing.JMenuItem addFolderMenuItem;
 	private javax.swing.JLabel albumLabel;
 	private javax.swing.JTextField albumTextField;
@@ -629,7 +629,7 @@ public class Application extends javax.swing.JFrame implements Observer {
 
 		if (file != null) {
 			setControlsEnabled(true);
-
+			
 			titleTextField.setText(file
 					.getTextContentById(MP3TagFrameTypes.SONGNAME));
 			artistTextField.setText(file
@@ -641,10 +641,10 @@ public class Application extends javax.swing.JFrame implements Observer {
 					.getTextContentById(MP3TagFrameTypes.YEAR));
 
 			ImageIcon icon = ImageOpperations.ByteArrayToIcon(
-					file.getCoverPicture(), CoverImageLabel.getWidth(),
-					CoverImageLabel.getHeight());
+					file.getCoverPicture(), coverImageLabel.getWidth(),
+					coverImageLabel.getHeight());
 
-			CoverImageLabel.setIcon(icon);
+			coverImageLabel.setIcon(icon);
 
 			// Delete button only enabled if file contains cover image.
 			if (icon.getImage() == null)
@@ -653,19 +653,23 @@ public class Application extends javax.swing.JFrame implements Observer {
 				deleteCoverButton.setEnabled(true);
 
 		} else {
+			setControlsEnabled(false);
+			
 			titleTextField.setText(""); //$NON-NLS-1$
 			artistTextField.setText(""); //$NON-NLS-1$
 			albumTextField.setText(""); //$NON-NLS-1$
 			yearTextField.setText(""); //$NON-NLS-1$
 			yearTextField.setBackground(Color.white);
 
-			CoverImageLabel.setIcon(noCoverImageIcon);
+			coverImageLabel.setIcon(noCoverImageIcon);
 		}
+		
+		stopPlayerButton.setEnabled(MP3Player.getInstance().isPlaying());
 	}
 
 	public void updatePlayer() {
-		if (MP3Player.getMP3Player().isPlaying()) {
-			playerSongLabel.setText(Captions.getString("App.nowPlaying", MP3Player.getMP3Player().getActualTitle())); //$NON-NLS-1$
+		if (MP3Player.getInstance().isPlaying()) {
+			playerSongLabel.setText(Captions.getString("App.nowPlaying", MP3Player.getInstance().getSong())); //$NON-NLS-1$
 		} else {
 			playerSongLabel.setText(Captions.getString("App.nothingIsPlayer")); //$NON-NLS-1$
 		}

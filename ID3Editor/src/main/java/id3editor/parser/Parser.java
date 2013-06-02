@@ -53,7 +53,7 @@ public class Parser {
 	 */
 	public static void parseMP3File(MP3File file) {
 		try {
-			RandomAccessFile raf = new RandomAccessFile(file.getFilePath(), "r");
+			RandomAccessFile raf = new RandomAccessFile(file.getFile(), "r");
 
 			byte[] tagHeader = new byte[TAG_HEADER_LENGTH];
 			raf.read(tagHeader);
@@ -70,7 +70,7 @@ public class Parser {
 			}
 		} catch (Exception ex) {
 			System.err.println("Error while parsing MP3File: "
-					+ file.getFilePath().getName() + " in parser");
+					+ file.getFile().getName() + " in parser");
 			System.err.println(ex.toString());
 		}
 	}

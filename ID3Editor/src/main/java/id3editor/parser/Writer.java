@@ -73,7 +73,7 @@ public class Writer extends Observable {
 		private void writeFile(MP3File song) {
 			try {
 
-				File orginal = song.getFilePath();
+				File orginal = song.getFile();
 				RandomAccessFile org = new RandomAccessFile(orginal, "rw");
 				byte[] tag = song.getBytes();
 				byte[] orginalTagHeader = new byte[10];
