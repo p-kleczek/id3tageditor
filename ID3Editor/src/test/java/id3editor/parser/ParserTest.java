@@ -3,6 +3,7 @@ package id3editor.parser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ParserTest {
@@ -15,7 +16,7 @@ public class ParserTest {
 		assertEquals(191, Parser.getTagSize(nullHeader));
 	}
 
-	@Test
+	@Ignore
 	public void testParseMP3File() {
 		fail("Not yet implemented");
 	}

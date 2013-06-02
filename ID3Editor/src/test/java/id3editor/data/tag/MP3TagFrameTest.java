@@ -2,6 +2,7 @@ package id3editor.data.tag;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import id3editor.data.tag.MP3TagFrame.Flag;
 
 import org.junit.Test;
 
@@ -15,12 +16,12 @@ public class MP3TagFrameTest {
 		
 		assertEquals("EMPT", frame.getType());
 
-		assertTrue(frame.isTagAlterPreservation());
-		assertTrue(frame.isFileAlterPreservation());
-		assertTrue(frame.isReadOnly());
-		assertTrue(frame.isGroupingIdentity());
-		assertTrue(frame.isCompression());
-		assertTrue(frame.isEncryption());
+		assertTrue(frame.isFlagSet(Flag.TAG_ALTER_PRESERVATION));
+		assertTrue(frame.isFlagSet(Flag.FILE_ALTER_PRESERVATION));
+		assertTrue(frame.isFlagSet(Flag.READ_ONLY));
+		assertTrue(frame.isFlagSet(Flag.GROUPING_IDENTITY));
+		assertTrue(frame.isFlagSet(Flag.COMPRESSION));
+		assertTrue(frame.isFlagSet(Flag.ENCRYPTION));
 	}
 	
 	

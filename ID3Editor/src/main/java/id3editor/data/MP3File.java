@@ -1,21 +1,25 @@
 package id3editor.data;
 
+import static id3editor.toolbox.Constants.BYTES_PER_INT;
+import static id3editor.toolbox.Constants.TAG_HEADER_LENGTH;
 import id3editor.data.tag.MP3TagFrame;
 import id3editor.data.tag.MP3TagFrameTypes;
 import id3editor.data.tag.PictureFrame;
 import id3editor.data.tag.TextFrame;
 import id3editor.parser.Parser;
-import id3editor.toolbox.BitOppereations;
 import id3editor.toolbox.ByteOpperations;
 import id3editor.xml.ByteArrayMarshallerAdapter;
 
-import static id3editor.toolbox.Constants.*;
-
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.BitSet;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import static id3editor.toolbox.Constants.BITS_PER_BYTE;
 
 /**
  * The <code>MP3File</code> class represents an ID3v2.3 tag header.
@@ -25,9 +29,16 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class MP3File extends MP3Object {
 
 	private static final int FLAGS_OFFSET = 5;
-	private static final int UNSYNCHRONIZATION_BIT_NUMBER = 7;
-	private static final int EXTENDED_HEADER_BIT_NUMBER = 6;
-	private static final int EXPERIMENTAL_INDICATOR_BIT_NUMBER = 5;
+
+	public static enum Flag {
+		UNSYNCHRONIZATION(7), EXTENDED_HEADER(6), EXPERIMENTAL_INDICATOR(5);
+
+		private final int bitNo;
+
+		private Flag(int bitNo) {
+			this.bitNo = bitNo;
+		}
+	}
 
 	private File file = new File("");
 
@@ -35,9 +46,8 @@ public class MP3File extends MP3Object {
 
 	private byte[] fileIdentifier = new byte[3];
 	private byte[] version = new byte[2];
-	private boolean unsynchronisation = false;
-	private boolean extendedHeader = false;
-	private boolean experimentalIndicator = false;
+
+	private BitSet flags = new BitSet(BITS_PER_BYTE);
 
 	public MP3File() {
 	}
@@ -57,12 +67,8 @@ public class MP3File extends MP3Object {
 	public void createTag(byte[] tagHeader) {
 		System.arraycopy(tagHeader, 0, fileIdentifier, 0, fileIdentifier.length);
 		System.arraycopy(tagHeader, 3, version, 0, version.length);
-		unsynchronisation = BitOppereations.testBit(tagHeader[FLAGS_OFFSET],
-				UNSYNCHRONIZATION_BIT_NUMBER);
-		extendedHeader = BitOppereations.testBit(tagHeader[FLAGS_OFFSET],
-				EXTENDED_HEADER_BIT_NUMBER);
-		experimentalIndicator = BitOppereations.testBit(
-				tagHeader[FLAGS_OFFSET], EXPERIMENTAL_INDICATOR_BIT_NUMBER);
+		flags = BitSet.valueOf(Arrays.copyOfRange(tagHeader, FLAGS_OFFSET,
+				FLAGS_OFFSET + 1));
 	}
 
 	@XmlElement(name = "path")
@@ -70,8 +76,8 @@ public class MP3File extends MP3Object {
 		return file;
 	}
 
-	public void setFile(File file) {
-		this.file = file;
+	public void setFile(File path) {
+		this.file = path;
 	}
 
 	/**
@@ -96,18 +102,11 @@ public class MP3File extends MP3Object {
 
 		MP3File fileCopy = new MP3File();
 
-		fileCopy.setFile(file);
+		fileCopy.file = new File(file.getPath());
 
-		fileCopy.fileIdentifier = new byte[fileIdentifier.length];
-		System.arraycopy(fileIdentifier, 0, fileCopy.fileIdentifier, 0,
-				fileIdentifier.length);
-
-		fileCopy.version = new byte[version.length];
-		System.arraycopy(version, 0, fileCopy.version, 0, version.length);
-
-		fileCopy.unsynchronisation = unsynchronisation;
-		fileCopy.extendedHeader = extendedHeader;
-		fileCopy.experimentalIndicator = experimentalIndicator;
+		fileCopy.fileIdentifier = Arrays.copyOf(fileIdentifier, fileIdentifier.length);
+		fileCopy.version = Arrays.copyOf(version, version.length);
+		fileCopy.flags = (BitSet) flags.clone();
 
 		for (MP3Object child : childs) {
 			if (child instanceof MP3TagFrame) {
@@ -149,29 +148,29 @@ public class MP3File extends MP3Object {
 
 	@XmlElement(name = "unsynchronisation")
 	public boolean isUnsynchronisation() {
-		return unsynchronisation;
+		return flags.get(Flag.UNSYNCHRONIZATION.bitNo);
 	}
 
-	public void setUnsynchronisation(boolean unsynchronisation) {
-		this.unsynchronisation = unsynchronisation;
+	public void setUnsynchronisation(boolean value) {
+		flags.set(Flag.UNSYNCHRONIZATION.bitNo, value);
 	}
 
 	@XmlElement(name = "extendedHeader")
 	public boolean isExtendedHeader() {
-		return extendedHeader;
+		return flags.get(Flag.EXTENDED_HEADER.bitNo);
 	}
 
-	public void setExtendedHeader(boolean extendedHeader) {
-		this.extendedHeader = extendedHeader;
+	public void setExtendedHeader(boolean value) {
+		flags.set(Flag.EXTENDED_HEADER.bitNo, value);
 	}
 
 	@XmlElement(name = "experimentalIndicator")
 	public boolean isExperimentalIndicator() {
-		return experimentalIndicator;
+		return flags.get(Flag.EXPERIMENTAL_INDICATOR.bitNo);
 	}
 
-	public void setExperimentalIndicator(boolean experimentalIndicator) {
-		this.experimentalIndicator = experimentalIndicator;
+	public void setExperimentalIndicator(boolean value) {
+		flags.set(Flag.EXPERIMENTAL_INDICATOR.bitNo, value);
 	}
 
 	private MP3TagFrame getFrameById(String frameId) {
@@ -289,17 +288,8 @@ public class MP3File extends MP3Object {
 		System.arraycopy("ID3".getBytes(), 0, result, 0, 3);
 		System.arraycopy(version, 0, result, 3, version.length);
 
-		if (unsynchronisation)
-			result[5] = BitOppereations.setBit(result[FLAGS_OFFSET],
-					UNSYNCHRONIZATION_BIT_NUMBER);
-
-		if (extendedHeader)
-			result[5] = BitOppereations.setBit(result[FLAGS_OFFSET],
-					EXTENDED_HEADER_BIT_NUMBER);
-
-		if (experimentalIndicator)
-			result[5] = BitOppereations.setBit(result[FLAGS_OFFSET],
-					EXPERIMENTAL_INDICATOR_BIT_NUMBER);
+		byte[] flagArray = flags.toByteArray();
+		System.arraycopy(flagArray, 0, result, FLAGS_OFFSET, flagArray.length);
 
 		for (MP3Object objectFrame : childs) {
 
@@ -312,8 +302,7 @@ public class MP3File extends MP3Object {
 			result = buildResult;
 		}
 
-		byte[] tagSize = new byte[BYTES_PER_INT];
-		tagSize = ByteOpperations.convertSynchsafeIntToByte(result.length
+		byte[] tagSize = ByteOpperations.convertSynchsafeIntToByte(result.length
 				- TAG_HEADER_LENGTH);
 		System.arraycopy(tagSize, 0, result, 6, tagSize.length);
 
