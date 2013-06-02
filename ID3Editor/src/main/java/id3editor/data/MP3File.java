@@ -34,9 +34,9 @@ public class MP3File extends MP3Object {
 	public static enum Flag {
 		UNSYNCHRONIZATION(7), EXTENDED_HEADER(6), EXPERIMENTAL_INDICATOR(5);
 
-		private final int bitNo;
+		int bitNo;
 
-		private Flag(int bitNo) {
+		Flag(int bitNo) {
 			this.bitNo = bitNo;
 		}
 	}

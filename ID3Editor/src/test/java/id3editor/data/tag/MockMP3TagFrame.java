@@ -11,7 +11,7 @@ public class MockMP3TagFrame extends MP3TagFrame {
 	}
 
 	@Override
-	byte[] getContentBytes() {
+	protected byte[] getContentBytes() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -27,7 +27,7 @@ public class TextFrame extends MP3TagFrame {
 		System.arraycopy(data, 1, textContent, 0, textContent.length);
 
 		try {
-			text = new String(textContent, ENC_TYPES[(int) encoding]);
+			text = new String(textContent, ENCODINGS[(int) encoding]);
 		} catch (UnsupportedEncodingException ex) {
 			System.err.println("Error while decoding textFrame");
 			System.err.println(ex.toString());
@@ -72,7 +72,7 @@ public class TextFrame extends MP3TagFrame {
 
 		try {
 			outputStream.write(encoding);
-			outputStream.write(text.getBytes(ENC_TYPES[(int) encoding]));
+			outputStream.write(text.getBytes(ENCODINGS[(int) encoding]));
 		} catch (IOException e) {
 			System.err.println("Error in CommentFrame.getContentBytes");
 		}

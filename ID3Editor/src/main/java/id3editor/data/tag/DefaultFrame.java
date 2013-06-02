@@ -5,8 +5,8 @@ import id3editor.xml.ByteArrayMarshallerAdapter;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-
 /**
+ * The <code>DefaultFrame</code> class represents an unknown frame.
  * 
  * @author Pawel, Florian, Sebastian (Gruppe 4)
  */

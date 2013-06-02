@@ -64,7 +64,7 @@ public class PictureFrame extends MP3TagFrame {
 				mimeTypeArray = tmp;
 				offset++;
 			}
-			this.mimeType = new String(mimeTypeArray, ENC_TYPES[(int) encoding]);
+			this.mimeType = new String(mimeTypeArray, ENCODINGS[(int) encoding]);
 			offset++;
 
 			this.picturesType = data[offset];
@@ -80,7 +80,7 @@ public class PictureFrame extends MP3TagFrame {
 				offset++;
 			}
 			this.description = new String(descriptionTypeArray,
-					ENC_TYPES[(int) encoding]);
+					ENCODINGS[(int) encoding]);
 
 			offset++;
 
@@ -197,7 +197,7 @@ public class PictureFrame extends MP3TagFrame {
 			outputStream.write(mimeType.getBytes());
 			outputStream.write((byte) 0x00);
 			outputStream.write(picturesType);
-			outputStream.write(description.getBytes(ENC_TYPES[(int) encoding]));
+			outputStream.write(description.getBytes(ENCODINGS[(int) encoding]));
 			outputStream.write((byte) 0x00);
 			outputStream.write(image);
 		} catch (IOException e) {
