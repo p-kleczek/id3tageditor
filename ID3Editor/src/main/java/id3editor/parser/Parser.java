@@ -1,5 +1,7 @@
 package id3editor.parser;
 
+import static id3editor.toolbox.Constants.BYTES_PER_INT;
+import static id3editor.toolbox.Constants.TAG_HEADER_LENGTH;
 import id3editor.data.MP3File;
 import id3editor.data.MP3Object;
 import id3editor.data.tag.DefaultFrame;
@@ -14,8 +16,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-
-import static id3editor.toolbox.Constants.*;
 
 /**
  * 

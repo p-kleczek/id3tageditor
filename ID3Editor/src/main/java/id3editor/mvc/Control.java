@@ -20,8 +20,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.event.TreeSelectionEvent;
 
-
-
 /**
  * The <code>Control</code> class provides method to modify the data (eg.
  * changing cover, changing text tags) as well as listeners for View part.
@@ -202,42 +200,55 @@ public class Control extends Observable {
 	}
 
 	public void doMenuGuiAction(String actionCommand) {
-		if (actionCommand.equals("EXIT_MENU")) {
+		switch (actionCommand) {
+		case "EXIT_MENU":
 			System.exit(0);
-		} else if (actionCommand.equals("ADD_FOLDER_MENU")) {
+			break;
+		case "ADD_FOLDER_MENU":
 			addWatchedFolder();
-		} else if (actionCommand.equals("SAVE_MENU")) {
+			break;
+		case "SAVE_MENU":
 			saveChangesInModel();
-		} else {
-			System.out.println("doMenuAction recive unknown command: "
-					+ actionCommand);
+			break;
+		default:
+			throw new IllegalArgumentException(
+					"doMenuAction recive unknown command: " + actionCommand);
 		}
+
 		callGUI();
 	}
 
 	public void doCoverAction(String actionCommand) {
-		System.out.println(actionCommand);
-		if (actionCommand.equals("CHANGE_COVER")) {
+
+		switch (actionCommand) {
+		case "CHANGE_COVER":
 			changeCover();
-		} else if (actionCommand.equals("DELETE_COVER")) {
+			break;
+		case "DELETE_COVER":
 			deleteCover();
-		} else {
-			System.out.println("doCoverAction recive unknown command: "
-					+ actionCommand);
+			break;
+		default:
+			throw new IllegalArgumentException(
+					"doCoverAction recive unknown command: " + actionCommand);
 		}
+		
 		callGUI();
 	}
 
 	public void doPlayerAction(String actionCommand) {
 
-		if (actionCommand.equals("START_PLAYER")) {
+		switch (actionCommand) {
+		case "START_PLAYER":
 			MP3Player.getMP3Player().playSong(Model.getModel().getFileInWork());
-		} else if (actionCommand.equals("STOP_PLAYER")) {
+			break;
+		case "STOP_PLAYER":
 			MP3Player.getMP3Player().stopSong();
-		} else {
-			System.out.println("doPlayerAction recive unknown command: "
-					+ actionCommand);
+			break;
+		default:
+			throw new IllegalArgumentException(
+					"doPlayerAction recive unknown command: " + actionCommand);
 		}
+
 		callGUI();
 	}
 

@@ -1,6 +1,8 @@
 package id3editor.data;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import id3editor.data.tag.TextFrame;
 
 import org.junit.Ignore;
@@ -37,7 +39,7 @@ public class MP3FileTest {
 		mp3file.addChild(textFrame);
 
 		// test
-		assertEquals(textContent, mp3file.getTextContentByID(frameId));
+		assertEquals(textContent, mp3file.getTextContentById(frameId));
 	}
 
 	@Test
@@ -56,7 +58,7 @@ public class MP3FileTest {
 		mp3file.setTextContent(frameId, textContent);
 
 		// test
-		assertEquals(textContent, mp3file.getTextContentByID(frameId));
+		assertEquals(textContent, mp3file.getTextContentById(frameId));
 		assertTrue(mp3file.isModified());
 	}
 

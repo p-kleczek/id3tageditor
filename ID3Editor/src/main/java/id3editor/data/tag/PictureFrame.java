@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 public class PictureFrame extends MP3TagFrame {
 
-	public static int COVER_FRONT = 3;
+	public static byte COVER_FRONT = 3;
 
 	public static final String[] PIC_TYPES = { "Other",
 			"32x32 pixels file icon", "Other file icon", "Cover (front)",

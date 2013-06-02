@@ -1,12 +1,15 @@
 package id3editor.data;
 
 import id3editor.data.tag.MP3TagFrame;
+import id3editor.data.tag.MP3TagFrameTypes;
 import id3editor.data.tag.PictureFrame;
 import id3editor.data.tag.TextFrame;
 import id3editor.parser.Parser;
 import id3editor.toolbox.BitOppereations;
 import id3editor.toolbox.ByteOpperations;
 import id3editor.xml.ByteArrayMarshallerAdapter;
+
+import static id3editor.toolbox.Constants.*;
 
 import java.io.File;
 
@@ -45,7 +48,7 @@ public class MP3File extends MP3Object {
 	}
 
 	/**
-	 * Reads and set the tag informations for the song
+	 * Parses ID3v2 tag header.
 	 * 
 	 * @param tagHeader
 	 *            tag header as byte array
@@ -53,11 +56,11 @@ public class MP3File extends MP3Object {
 	public void createTag(byte[] tagHeader) {
 		System.arraycopy(tagHeader, 0, fileIdentifier, 0, fileIdentifier.length);
 		System.arraycopy(tagHeader, 3, version, 0, version.length);
-		unsynchronisation = id3editor.toolbox.BitOppereations.testBit(
-				tagHeader[FLAGS_OFFSET], UNSYNCHRONIZATION_BIT_NUMBER);
-		extendedHeader = id3editor.toolbox.BitOppereations.testBit(
-				tagHeader[FLAGS_OFFSET], EXTENDED_HEADER_BIT_NUMBER);
-		experimentalIndicator = id3editor.toolbox.BitOppereations.testBit(
+		unsynchronisation = BitOppereations.testBit(tagHeader[FLAGS_OFFSET],
+				UNSYNCHRONIZATION_BIT_NUMBER);
+		extendedHeader = BitOppereations.testBit(tagHeader[FLAGS_OFFSET],
+				EXTENDED_HEADER_BIT_NUMBER);
+		experimentalIndicator = BitOppereations.testBit(
 				tagHeader[FLAGS_OFFSET], EXPERIMENTAL_INDICATOR_BIT_NUMBER);
 	}
 
@@ -170,47 +173,54 @@ public class MP3File extends MP3Object {
 		this.experimentalIndicator = experimentalIndicator;
 	}
 
-	/**
-	 * Returns the content of the given text frame.
-	 * 
-	 * @param key
-	 *            ID of the text frame
-	 * @return content of the text frame
-	 */
-	public String getTextContentByID(String key) {
+	private MP3TagFrame getFrameById(String frameId) {
 		for (MP3Object object : childs) {
 			String objectType = ((MP3TagFrame) object).getType();
-			if (object instanceof TextFrame && objectType.equals(key)) {
-				return ((TextFrame) object).getText();
+			if (objectType.equals(frameId)) {
+				return (MP3TagFrame) object;
 			}
 		}
 
-		return "";
+		return null;
+	}
+
+	/**
+	 * Returns the content of the given text frame.
+	 * 
+	 * @param frameId
+	 *            ID of the text frame
+	 * @return content of the text frame
+	 */
+	public String getTextContentById(String frameId) {
+		MP3TagFrame frame = getFrameById(frameId);
+		return (frame == null) ? "" : ((TextFrame) frame).getText();
 	}
 
 	/**
 	 * Sets new content of the tag.
 	 * 
-	 * @param tagID
+	 * @param frameId
 	 *            keyname of the tag
 	 * @param text
 	 *            value to be set
 	 */
-	public void setTextContent(String tagID, String text) {
-		for (MP3Object object : childs) {
-			if (object instanceof TextFrame
-					&& ((MP3TagFrame) object).getType().equals(tagID)) {
-				((TextFrame) object).setText(text);
-				modified = true;
-				return;
-			}
+	public void setTextContent(String frameId, String text) {
+		modified = true;
+		MP3TagFrame frame = getFrameById(frameId);
+
+		if (frame == null) {
+			addNewTextFrame(frameId, text);
+		} else {
+			((TextFrame) frame).setText(text);
 		}
+	}
+
+	private void addNewTextFrame(String tagId, String text) {
 		TextFrame newFrame = new TextFrame();
-		newFrame.setType(tagID);
+		newFrame.setType(tagId);
 		newFrame.setText(text);
 		childs.add(newFrame);
 		newFrame.setParent(this);
-		modified = true;
 	}
 
 	/**
@@ -222,19 +232,15 @@ public class MP3File extends MP3Object {
 	 *         picture frame
 	 */
 	public byte[] getCoverPicture() {
-		for (MP3Object object : childs) {
-			if (object instanceof PictureFrame
-					&& ((PictureFrame) object).getType().equals("APIC")) {
-				PictureFrame picFrame = (PictureFrame) object;
-
-				String coverString = PictureFrame.PIC_TYPES[PictureFrame.COVER_FRONT];
-				if (picFrame.getPictureType().equals(coverString)) {
-					return picFrame.getImage();
-				}
-			}
+		MP3TagFrame frame = getFrameById(MP3TagFrameTypes.ATTACHED_PICTURE);
+		String coverString = PictureFrame.PIC_TYPES[PictureFrame.COVER_FRONT];
+		
+		if (frame == null) {
+			return new byte[0];
+		} else {
+			PictureFrame picFrame = (PictureFrame) frame;
+			return (picFrame.getPictureType().equals(coverString) ? picFrame.getImage() : null);
 		}
-
-		return new byte[0];
 	}
 
 	/**
@@ -246,28 +252,21 @@ public class MP3File extends MP3Object {
 	 */
 	public void setCoverPicture(File image) {
 		PictureFrame picFrame = null;
-
-		// Check is there is already a cover associated with the file.
-		for (MP3Object object : childs) {
-			if (((MP3TagFrame) object).getType().equals("APIC")) {
-				PictureFrame foundPicFrame = (PictureFrame) object;
-				String coverString = PictureFrame.PIC_TYPES[PictureFrame.COVER_FRONT];
-				if (foundPicFrame.getPictureType().equals(coverString)) {
-					picFrame = foundPicFrame;
-				}
+		MP3TagFrame frame = getFrameById(MP3TagFrameTypes.ATTACHED_PICTURE);
+		
+		if (frame != null) {
+			PictureFrame foundPicFrame = (PictureFrame) frame;
+			String coverString = PictureFrame.PIC_TYPES[PictureFrame.COVER_FRONT];
+			if (foundPicFrame.getPictureType().equals(coverString)) {
+				picFrame = foundPicFrame;
 			}
 		}
 
 		modified = true;
 
-		// If there is no image cover, "Remove cover" button should be grayed
-		// out.
-		assert !(picFrame == null && image == null);
-
 		if (picFrame == null) {
 			// No frame and new image - add image frame.
-			byte coverFrontCode = 0x03;
-			this.addChild(new PictureFrame(coverFrontCode, image));
+			this.addChild(new PictureFrame(PictureFrame.COVER_FRONT, image));
 		} else {
 			if (image == null)
 				this.removeChild(picFrame);
@@ -283,7 +282,7 @@ public class MP3File extends MP3Object {
 	 * @return modified frames as a byte stream
 	 */
 	public byte[] getBytes() {
-		byte[] result = new byte[10];
+		byte[] result = new byte[TAG_HEADER_LENGTH];
 
 		System.arraycopy("ID3".getBytes(), 0, result, 0, 3);
 		System.arraycopy(version, 0, result, 3, version.length);
@@ -300,8 +299,6 @@ public class MP3File extends MP3Object {
 			result[5] = BitOppereations.setBit(result[FLAGS_OFFSET],
 					EXPERIMENTAL_INDICATOR_BIT_NUMBER);
 
-		System.out.println("getData nach variablen: " + result.length);
-
 		for (MP3Object objectFrame : childs) {
 
 			MP3TagFrame frame = (MP3TagFrame) objectFrame;
@@ -310,13 +307,12 @@ public class MP3File extends MP3Object {
 
 			System.arraycopy(result, 0, buildResult, 0, result.length);
 			System.arraycopy(part, 0, buildResult, result.length, part.length);
-			System.out.println("getData nach frame: " + buildResult.length);
 			result = buildResult;
 		}
 
-		byte[] tagSize = new byte[4];
-		tagSize = ByteOpperations.convertSynchsafeIntToByte(result.length - 10);
-		System.arraycopy(tagSize, 0, result, 6, 4);
+		byte[] tagSize = new byte[BYTES_PER_INT];
+		tagSize = ByteOpperations.convertSynchsafeIntToByte(result.length - TAG_HEADER_LENGTH);
+		System.arraycopy(tagSize, 0, result, 6, tagSize.length);
 
 		return result;
 	}

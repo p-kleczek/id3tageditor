@@ -631,14 +631,14 @@ public class Application extends javax.swing.JFrame implements Observer {
 			setControlsEnabled(true);
 
 			titleTextField.setText(file
-					.getTextContentByID(MP3TagFrameTypes.SONGNAME));
+					.getTextContentById(MP3TagFrameTypes.SONGNAME));
 			artistTextField.setText(file
-					.getTextContentByID(MP3TagFrameTypes.COMPOSER));
+					.getTextContentById(MP3TagFrameTypes.COMPOSER));
 			albumTextField.setText(file
-					.getTextContentByID(MP3TagFrameTypes.ALBUM));
+					.getTextContentById(MP3TagFrameTypes.ALBUM));
 			yearTextField.setBackground(Color.white);
 			yearTextField.setText(file
-					.getTextContentByID(MP3TagFrameTypes.YEAR));
+					.getTextContentById(MP3TagFrameTypes.YEAR));
 
 			ImageIcon icon = ImageOpperations.ByteArrayToIcon(
 					file.getCoverPicture(), CoverImageLabel.getWidth(),

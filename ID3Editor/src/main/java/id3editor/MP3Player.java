@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Observable;
 
-
-
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
@@ -32,11 +30,12 @@ public class MP3Player extends Observable {
 			song = file;
 			callGUI();
 		} catch (Exception e) {
-			e.printStackTrace(System.out);
+			e.printStackTrace();
 			System.err.println("Error while playing a song");
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void stopSong() {
 		if (player != null) {
 			player.stop();

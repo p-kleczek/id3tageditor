@@ -98,13 +98,13 @@ public class Model {
 				} else if (child instanceof MP3File) {
 					MP3File song = (MP3File) child;
 					String name = song
-							.getTextContentByID(MP3TagFrameTypes.SONGNAME);
+							.getTextContentById(MP3TagFrameTypes.SONGNAME);
 					String composer = song
-							.getTextContentByID(MP3TagFrameTypes.COMPOSER);
+							.getTextContentById(MP3TagFrameTypes.COMPOSER);
 					String album = song
-							.getTextContentByID(MP3TagFrameTypes.ALBUM);
+							.getTextContentById(MP3TagFrameTypes.ALBUM);
 					String year = song
-							.getTextContentByID(MP3TagFrameTypes.YEAR);
+							.getTextContentById(MP3TagFrameTypes.YEAR);
 
 					tableModel.addRow(new String[] { "- " + name, composer,
 							album, year });
@@ -125,7 +125,7 @@ public class Model {
 	 */
 	public String getTextFromActualFile(String key) {
 		if (fileInWork != null) {
-			return fileInWork.getTextContentByID(key);
+			return fileInWork.getTextContentById(key);
 		} else {
 			return "";
 		}

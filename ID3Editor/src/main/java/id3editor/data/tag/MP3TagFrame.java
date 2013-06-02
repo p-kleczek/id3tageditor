@@ -163,7 +163,6 @@ public abstract class MP3TagFrame extends MP3Object {
 	 * @return frame including frame-header and frame-content as byte[]
 	 */
 	public byte[] getFrameBytes() {
-		System.out.println(getType());
 		byte[] header = getHeaderBytes();
 		byte[] content = getContentBytes();
 
